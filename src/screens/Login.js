@@ -9,8 +9,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import Logo from '../components/Logo';
+import Dashboard from './Dashboard';
 
 const DismissKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -19,40 +21,62 @@ const DismissKeyboard = ({children}) => (
 );
 
 export default class Login extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true,
+    };
+  }
+
+  UNSAFE_componentWillMount() {
+    setTimeout(() => {
+      this.setState({
+        isLoading: false,
+      });
+    }, 3000);
+  }
+
   render() {
     return (
       <DismissKeyboard>
         <SafeAreaView style={loginStyle.container}>
-          <KeyboardAvoidingView behavior="position">
-            <View>
-              <Logo />
-              <Text style={loginStyle.logotext}>Log In</Text>
+          {this.state.isLoading && (
+            <View style={loginStyle.loading}>
+              <ActivityIndicator size="large" color="#0000ff" />
             </View>
-            <View style={loginStyle.form}>
-              <View style={loginStyle.field}>
-                <TextInput
-                  style={loginStyle.input}
-                  underlineColorAndroid="transparent"
-                  placeholder="Email"
-                  placeholderTextColor="#00a8ff"
-                  autoCapitalize="none"
-                />
-                <TextInput
-                  style={loginStyle.input}
-                  underlineColorAndroid="transparent"
-                  placeholder="Password"
-                  placeholderTextColor="#00a8ff"
-                  autoCapitalize="none"
-                />
+          )}
+          {!this.state.isLoading && (
+            <KeyboardAvoidingView behavior="position">
+              <View>
+                <Logo />
+                <Text style={loginStyle.logotext}>Log In</Text>
               </View>
-              <TouchableOpacity>
-                <View style={loginStyle.button}>
-                  <Text style={loginStyle.btntext}>Login</Text>
+              <View style={loginStyle.form}>
+                <View style={loginStyle.field}>
+                  <TextInput
+                    style={loginStyle.input}
+                    underlineColorAndroid="transparent"
+                    placeholder="Email"
+                    placeholderTextColor="#00a8ff"
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={loginStyle.input}
+                    underlineColorAndroid="transparent"
+                    placeholder="Password"
+                    placeholderTextColor="#00a8ff"
+                    autoCapitalize="none"
+                  />
                 </View>
-              </TouchableOpacity>
-              <Text style={loginStyle.signup}>Don't have account ?</Text>
-            </View>
-          </KeyboardAvoidingView>
+                <TouchableOpacity>
+                  <View style={loginStyle.button}>
+                    <Text style={loginStyle.btntext}>Login</Text>
+                  </View>
+                </TouchableOpacity>
+                <Text style={loginStyle.signup}>Don't have account ?</Text>
+              </View>
+            </KeyboardAvoidingView>
+          )}
         </SafeAreaView>
       </DismissKeyboard>
     );
@@ -60,6 +84,10 @@ export default class Login extends Component {
 }
 
 const loginStyle = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#E3E6ED',

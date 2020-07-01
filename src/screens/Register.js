@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {LogoRegister} from '../components/Logo';
 
@@ -19,47 +20,71 @@ const DismissKeyboard = ({children}) => (
 );
 
 export default class Register extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true,
+    };
+  }
+  UNSAFE_componentWillMount() {
+    setTimeout(() => {
+      this.setState({
+        isLoading: false,
+      });
+    }, 3000);
+  }
   render() {
     return (
       <DismissKeyboard>
-        <SafeAreaView style={loginStyle.container}>
-          <KeyboardAvoidingView behavior="position">
-            <View>
-              <LogoRegister />
-              <Text style={loginStyle.logotext}>Register</Text>
+        <SafeAreaView style={registerStyle.container}>
+          {this.state.isLoading && (
+            <View style={registerStyle.loading}>
+              <ActivityIndicator size="large" color="#0000ff" />
             </View>
-            <View style={loginStyle.form}>
-              <View style={loginStyle.field}>
-                <TextInput
-                  style={loginStyle.input}
-                  underlineColorAndroid="transparent"
-                  placeholder="Email"
-                  placeholderTextColor="#00a8ff"
-                  autoCapitalize="none"
-                />
-                <TextInput
-                  style={loginStyle.input}
-                  underlineColorAndroid="transparent"
-                  placeholder="Password"
-                  placeholderTextColor="#00a8ff"
-                  autoCapitalize="none"
-                />
+          )}
+          {!this.state.isLoading && (
+            <KeyboardAvoidingView behavior="position">
+              <View>
+                <LogoRegister />
+                <Text style={registerStyle.logotext}>Register</Text>
               </View>
-              <TouchableOpacity>
-                <View style={loginStyle.button}>
-                  <Text style={loginStyle.btntext}>Register</Text>
+              <View style={registerStyle.form}>
+                <View style={registerStyle.field}>
+                  <TextInput
+                    style={registerStyle.input}
+                    underlineColorAndroid="transparent"
+                    placeholder="Email"
+                    placeholderTextColor="#00a8ff"
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={registerStyle.input}
+                    underlineColorAndroid="transparent"
+                    placeholder="Password"
+                    placeholderTextColor="#00a8ff"
+                    autoCapitalize="none"
+                  />
                 </View>
-              </TouchableOpacity>
-              <Text style={loginStyle.signup}>Already have account ?</Text>
-            </View>
-          </KeyboardAvoidingView>
+                <TouchableOpacity>
+                  <View style={registerStyle.button}>
+                    <Text style={registerStyle.btntext}>Register</Text>
+                  </View>
+                </TouchableOpacity>
+                <Text style={registerStyle.signup}>Already have account ?</Text>
+              </View>
+            </KeyboardAvoidingView>
+          )}
         </SafeAreaView>
       </DismissKeyboard>
     );
   }
 }
 
-const loginStyle = StyleSheet.create({
+const registerStyle = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#E3E6ED',
