@@ -40,6 +40,7 @@ export default class Login extends Component {
 
   handleSubmit = () => {
     this.setState({btnLoading: true});
+    this.props.navigation.navigate('dashboard');
   };
 
   render() {
