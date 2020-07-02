@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import {Button, colors, ThemeProvider, Avatar} from 'react-native-elements';
+import {Button, colors, ThemeProvider, Badge} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
 import book from '../assets/Empon.jpg';
 export default class DetailBook extends Component {
@@ -29,11 +29,22 @@ export default class DetailBook extends Component {
             <View style={detailBookStyle.bookImg}>
               <Image source={book} style={detailBookStyle.image} />
               <Text style={detailBookStyle.bookTitle}>Empon Empon</Text>
+              <Badge value="Available" status="warning" />
             </View>
           </View>
           <View>
             <View>
-              <Text>adasdasdddddddddddddddddddddddd</Text>
+              <Text style={detailBookStyle.bookDesc}>
+                ais simply dummy text of the printing and typesetting industry.
+                Lorem Ipsum has been the industry's standard dummy text ever
+                since the 1500s, when an unknown printer took a galley of type
+                and scrambled it to make a type specimen book. It has survived
+                not only five centuries, but also the leap into electronic
+                typesetting, remaining essentially unchanged. It was popularised
+                in the 1960s with the release of Letraset sheets containing
+                Lorem Ipsum passages, and more recently with desktop publishing
+                software like Aldus PageMaker including versions of Lorem Ipsum
+              </Text>
             </View>
             <View style={detailBookStyle.btnBorrow}>
               <Button title="Borrow" />
@@ -113,8 +124,11 @@ const detailBookStyle = StyleSheet.create({
     fontSize: 20,
     color: 'white',
   },
+  bookDesc: {
+    margin: 10,
+  },
   btnBorrow: {
-    marginTop: 50,
+    marginTop: 10,
     alignItems: 'center',
   },
 });

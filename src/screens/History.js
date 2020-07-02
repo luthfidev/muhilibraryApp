@@ -33,8 +33,11 @@ export default class History extends Component {
     return (
       <View style={detailBookStyle.container}>
         <Header
-          leftComponent={{icon: 'menu', color: '#fff'}}
-          centerComponent={{text: 'History Transaction', style: {color: '#fff'}}}
+          leftComponent={{icon: 'arrow-back', color: '#fff'}}
+          centerComponent={{
+            text: 'History Transaction',
+            style: {color: '#fff'},
+          }}
           rightComponent={{icon: 'home', color: '#fff'}}
         />
         <SearchBar

@@ -40,7 +40,9 @@ export default class Profile extends Component {
             </View>
           </View>
         </View>
-        <Text>Hello</Text>
+        <View>
+          <Text>Recent Book</Text>
+        </View>
       </View>
     );
   }
