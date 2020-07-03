@@ -1,18 +1,5 @@
 import React, {Component} from 'react';
-import {
-  Platform,
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  TouchableOpacity,
-  ActivityIndicator,
-  Image,
-} from 'react-native';
+import {Platform, StyleSheet, View, Text, Image} from 'react-native';
 import {Button, colors, ThemeProvider, Badge} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
 import book from '../assets/Empon.jpg';

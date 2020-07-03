@@ -33,6 +33,11 @@ export default class Register extends Component {
       });
     }, 3000);
   }
+
+  navigateLogin = () => {
+    this.props.navigation.navigate('login');
+  };
+
   render() {
     return (
       <DismissKeyboard>
@@ -70,7 +75,14 @@ export default class Register extends Component {
                     <Text style={registerStyle.btntext}>Register</Text>
                   </View>
                 </TouchableOpacity>
-                <Text style={registerStyle.signup}>Already have account ?</Text>
+                <View style={registerStyle.signup}>
+                  <Text>Don't have account ?</Text>
+                  <Text
+                    style={registerStyle.btnLogin}
+                    onPress={this.navigateLogin}>
+                    Sign In
+                  </Text>
+                </View>
               </View>
             </KeyboardAvoidingView>
           )}
@@ -127,6 +139,11 @@ const registerStyle = StyleSheet.create({
     color: '#f5f6fa',
   },
   signup: {
+    flexDirection: 'row',
     marginTop: 25,
+  },
+  btnLogin: {
+    marginLeft: 5,
+    color: 'blue',
   },
 });

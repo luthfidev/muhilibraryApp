@@ -1,27 +1,12 @@
 import React, {Component} from 'react';
-import {
-  Platform,
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
-import {Button, colors, ThemeProvider, Avatar} from 'react-native-elements';
+import {StyleSheet, View, Text} from 'react-native';
+import {Avatar} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
 export default class Profile extends Component {
   render() {
     return (
       <View style={profileStyle.container}>
         <View style={profileStyle.header}>
-          <View style={profileStyle.actionBack}>
-            <Icon name="arrow-back" color="white" />
-          </View>
           <View style={profileStyle.avatar}>
             <View style={profileStyle.center}>
               <Avatar

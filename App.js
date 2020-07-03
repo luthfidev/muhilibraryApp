@@ -3,18 +3,14 @@ import React, {Component} from 'react';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 
-import DashboardScreen from './src/screens/Dashboard';
 import LoginScreen from './src/screens/Login';
 import RegisterScreen from './src/screens/Register';
-import ProfileScreen from './src/screens/Profile';
+
 import DetailBookScreen from './src/screens/DetailBook';
-import HistoryScreen from './src/screens/History';
+import Tab from './src/components/Tab';
 
 const Stack = createStackNavigator();
-const BottomTab = createBottomTabNavigator();
-
 
 export default class App extends Component {
   constructor(props) {
@@ -25,14 +21,29 @@ export default class App extends Component {
   }
 
   render() {
+    const Login = (props) => <LoginScreen login={this.login} {...props} />;
     return (
       <>
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen
-              component={LoginScreen}
+              component={Login}
+              options={{
+                headerShown: false,
+              }}
               name={'login'}
-              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              component={RegisterScreen}
+              options={{
+                headerShown: false,
+              }}
+              name={'register'}
+            />
+            <Stack.Screen
+              options={{title: 'Detail', headerShown: false}}
+              component={Tab}
+              name={'detail'}
             />
           </Stack.Navigator>
         </NavigationContainer>

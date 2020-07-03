@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
 import {Button, colors, ThemeProvider} from 'react-native-elements';
@@ -40,7 +39,12 @@ export default class Login extends Component {
 
   handleSubmit = () => {
     this.setState({btnLoading: true});
-    this.props.navigation.navigate('dashboard');
+    this.props.navigation.navigate('detail');
+    this.setState({btnLoading: false});
+  };
+
+  navigateSignup = () => {
+    this.props.navigation.navigate('register');
   };
 
   render() {
@@ -81,7 +85,14 @@ export default class Login extends Component {
                     loading={this.state.btnLoading}
                     onPress={this.handleSubmit}
                   />
-                  <Text style={loginStyle.signup}>Don't have account ?</Text>
+                  <View style={loginStyle.signup}>
+                    <Text>Don't have account ?</Text>
+                    <Text
+                      style={loginStyle.btnSignup}
+                      onPress={this.navigateSignup}>
+                      Sign Up
+                    </Text>
+                  </View>
                 </View>
               </KeyboardAvoidingView>
             )}
@@ -160,5 +171,10 @@ const loginStyle = StyleSheet.create({
   },
   signup: {
     marginTop: 25,
+    flexDirection: 'row',
+  },
+  btnSignup: {
+    marginLeft: 5,
+    color: 'blue',
   },
 });
