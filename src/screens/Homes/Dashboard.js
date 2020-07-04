@@ -11,27 +11,30 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
-  RefreshControl,
   BackHandler,
+  FlatList,
 } from 'react-native';
 import {SearchBar, Header} from 'react-native-elements';
 import {connect} from 'react-redux';
-import {logout} from '../../redux/actions/auth';
+import {getbooks} from '../../redux/actions/book';
 const {width: screenWidth} = Dimensions.get('window');
 
-import ENTRIES1 from '../../components/dataBook';
+// data dummy
+/* import ENTRIES1 from '../../components/dataBook'; */
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoading: true,
+      dataBooks: [],
       refreshing: false,
+      currentPage: 1,
       search: '',
     };
-    if (!this.props.auth.token) {
+    /*  if (!this.props.auth.token) {
       this.props.navigation.navigate('login');
-    }
+    } */
   }
 
   UNSAFE_componentWillMount() {
@@ -45,34 +48,59 @@ class Dashboard extends Component {
     });
   }
 
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData = async () => {
+    await this.props.getbooks('?page='.concat(this.state.currentPage));
+    const {dataBooks, isLoading} = this.props.books;
+    this.setState({dataBooks, isLoading});
+  };
+
+  nextPage = () => {
+    this.setState({currentPage: this.state.currentPage + 1}, () => {
+      this.fetchData({page: this.state.currentPage});
+    });
+  };
+
   _onRefresh = () => {
-    /*  this.setState({refreshing: true});
-    fetchData().then(() => {
-      this.setState({refreshing: false});
-    }); */
     this.setState({refreshing: true});
-    setTimeout(() => {
-      this.setState({
-        refreshing: false,
-      });
-    }, 3000);
+    this.fetchData(this.state.currentPage).then(() => {
+      this.setState({refreshing: false});
+    });
   };
 
   updateSearch = (search) => {
     this.setState({search});
   };
+
   _renderItem({item, index}) {
     return (
       <View style={dashboardStyle.item}>
         <Image
           style={dashboardStyle.imageContainer}
-          source={{uri: item.illustration}}
+          source={{uri: item.image}}
         />
       </View>
     );
   }
+  _renderItemFlat({item, index}) {
+    return (
+      <View style={homeStyle.item}>
+        <View style={homeStyle.pictureWrapper}>
+          <Image style={homeStyle.picture} source={{uri: item.image}} />
+        </View>
+        <View style={homeStyle.textWrapper}>
+          <Text style={homeStyle.textName}>{item.title}</Text>
+          <Text>{item.title}</Text>
+        </View>
+      </View>
+    );
+  }
+
   render() {
-    const {search} = this.state;
+    const {search, currentPage, dataBooks, isLoading} = this.state;
     return (
       <SafeAreaView style={dashboardStyle.container}>
         {this.state.isLoading && (
@@ -83,13 +111,13 @@ class Dashboard extends Component {
         {!this.state.isLoading && (
           <>
             <View style={dashboardStyle.header}>
-              <Header
+              {/* <Header
                 centerComponent={{
                   text: 'List Book',
                   style: {color: '#fff'},
                 }}
                 rightComponent={{icon: 'home', color: '#fff'}}
-              />
+              /> */}
               <SearchBar
                 platform="android"
                 placeholder="Type Here..."
@@ -97,78 +125,32 @@ class Dashboard extends Component {
                 value={search}
               />
             </View>
-            <ScrollView
-              refreshControl={
-                <RefreshControl
-                  refreshing={this.state.refreshing}
-                  onRefresh={this._onRefresh}
-                />
-              }>
-              <View style={dashboardStyle.booklist}>
-                <Text style={dashboardStyle.titlelist}>
-                  Top Recomended Book
-                </Text>
-                <Carousel
-                  layout={'default'}
-                  activeSlideAlignment={'center'}
-                  loop={true}
-                  enableSnap={true}
-                  autoplay={true}
-                  autoplayInterval={3000}
-                  sliderWidth={screenWidth}
-                  sliderHeight={150}
-                  itemWidth={100}
-                  data={ENTRIES1}
-                  renderItem={this._renderItem}
-                />
-              </View>
-              <View style={dashboardStyle.booklist}>
-                <Text style={dashboardStyle.titlelist}>Book</Text>
-                <Carousel
-                  layout={'default'}
-                  activeSlideAlignment={'center'}
-                  loop={true}
-                  enableSnap={true}
-                  autoplay={true}
-                  autoplayInterval={3000}
-                  sliderWidth={screenWidth}
-                  sliderHeight={150}
-                  itemWidth={100}
-                  data={ENTRIES1}
-                  renderItem={this._renderItem}
-                />
-              </View>
-              <View style={dashboardStyle.booklist}>
-                <Carousel
-                  layout={'default'}
-                  activeSlideAlignment={'center'}
-                  loop={true}
-                  enableSnap={true}
-                  autoplay={true}
-                  autoplayInterval={3000}
-                  sliderWidth={screenWidth}
-                  sliderHeight={150}
-                  itemWidth={100}
-                  data={ENTRIES1}
-                  renderItem={this._renderItem}
-                />
-              </View>
-              <View style={dashboardStyle.booklist}>
-                <Carousel
-                  layout={'default'}
-                  activeSlideAlignment={'center'}
-                  loop={true}
-                  enableSnap={true}
-                  autoplay={true}
-                  autoplayInterval={3000}
-                  sliderWidth={screenWidth}
-                  sliderHeight={150}
-                  itemWidth={100}
-                  data={ENTRIES1}
-                  renderItem={this._renderItem}
-                />
-              </View>
-            </ScrollView>
+            <View style={dashboardStyle.booklist}>
+              <Text style={dashboardStyle.titlelist}>Top Recomended Book</Text>
+              <Carousel
+                layout={'default'}
+                activeSlideAlignment={'center'}
+                loop={true}
+                enableSnap={true}
+                autoplay={true}
+                autoplayInterval={3000}
+                sliderWidth={screenWidth}
+                sliderHeight={150}
+                itemWidth={100}
+                data={this.props.books.dataBooks}
+                renderItem={this._renderItem}
+              />
+            </View>
+            <FlatList
+              style={dashboardStyle.booklist}
+              data={dataBooks}
+              renderItem={this._renderItemFlat}
+              keyExtractor={(item) => item.email}
+              onRefresh={() => this.fetchData({page: currentPage})}
+              refreshing={isLoading}
+              onEndReached={this.nextPage}
+              onEndReachedThreshold={0.5}
+            />
           </>
         )}
       </SafeAreaView>
@@ -177,11 +159,11 @@ class Dashboard extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  auth: state.auth,
+  books: state.books,
 });
 
 const mapDispatchToProps = {
-  logout,
+  getbooks,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
@@ -195,6 +177,7 @@ const dashboardStyle = StyleSheet.create({
     flex: 1,
   },
   header: {
+    marginTop: 15,
     marginBottom: 10,
   },
   titlelist: {
@@ -220,5 +203,38 @@ const dashboardStyle = StyleSheet.create({
   booklist: {
     marginTop: 10,
     marginBottom: 10,
+  },
+});
+
+const homeStyle = StyleSheet.create({
+  item: {
+    height: 80,
+    flexDirection: 'row',
+    marginTop: 15,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingRight: 30,
+    paddingLeft: 30,
+  },
+  pictureWrapper: {
+    width: 70,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  picture: {
+    height: 80,
+    width: 70,
+    borderRadius: 5,
+    backgroundColor: 'black',
+  },
+  textWrapper: {
+    justifyContent: 'center',
+    marginLeft: 10,
+    padding: 10,
+  },
+  textName: {
+    fontWeight: 'bold',
+    fontSize: 18,
   },
 });

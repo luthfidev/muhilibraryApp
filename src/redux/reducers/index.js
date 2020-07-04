@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import hardSet from 'redux-persist/lib/stateReconciler/hardSet';
 // import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2'
 import auth from './auth';
+import books from './book';
 
 const persistConfig = {
   key: 'root',
@@ -15,6 +16,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   auth,
+  books,
 });
 
 // export default(rootReducer)
