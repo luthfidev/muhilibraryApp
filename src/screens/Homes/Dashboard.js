@@ -12,14 +12,16 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  BackHandler,
 } from 'react-native';
 import {SearchBar, Header} from 'react-native-elements';
-
+import {connect} from 'react-redux';
+import {logout} from '../../redux/actions/auth';
 const {width: screenWidth} = Dimensions.get('window');
 
-import ENTRIES1 from '../components/dataBook';
+import ENTRIES1 from '../../components/dataBook';
 
-export default class Dashboard extends Component {
+class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -27,6 +29,9 @@ export default class Dashboard extends Component {
       refreshing: false,
       search: '',
     };
+    if (!this.props.auth.token) {
+      this.props.navigation.navigate('login');
+    }
   }
 
   UNSAFE_componentWillMount() {
@@ -35,6 +40,9 @@ export default class Dashboard extends Component {
         isLoading: false,
       });
     }, 3000);
+    BackHandler.addEventListener('hardwareBackPress', function () {
+      return true;
+    });
   }
 
   _onRefresh = () => {
@@ -167,6 +175,16 @@ export default class Dashboard extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+
+const mapDispatchToProps = {
+  logout,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
 
 const dashboardStyle = StyleSheet.create({
   loading: {

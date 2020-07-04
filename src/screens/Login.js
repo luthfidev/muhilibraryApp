@@ -10,8 +10,12 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {Button, colors, ThemeProvider} from 'react-native-elements';
+import {connect} from 'react-redux';
+
+import {login} from '../redux/actions/auth';
 import Logo from '../components/Logo';
 
 const DismissKeyboard = ({children}) => (
@@ -20,27 +24,52 @@ const DismissKeyboard = ({children}) => (
   </TouchableWithoutFeedback>
 );
 
-export default class Login extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      email: '',
+      password: '',
       isLoading: true,
       btnLoading: false,
     };
+    if (this.props.auth.token) {
+      this.props.navigation.navigate('home');
+    }
   }
 
   UNSAFE_componentWillMount() {
     setTimeout(() => {
       this.setState({
+        error: null,
+        errorInfo: null,
         isLoading: false,
       });
     }, 3000);
   }
 
-  handleSubmit = () => {
-    this.setState({btnLoading: true});
-    this.props.navigation.navigate('detail');
-    this.setState({btnLoading: false});
+  onEmailChange = (email) => {
+    this.setState({email});
+  };
+  onPasswordChange = (password) => {
+    this.setState({password});
+  };
+
+  handleSubmit = async () => {
+    const {email, password} = this.state;
+    await this.props
+      .login(email, password)
+      .then((response) => {
+        Alert.alert(this.props.auth.successMsg);
+        this.setState({
+          email: '',
+          password: '',
+        });
+        this.props.navigation.navigate('home');
+      })
+      .catch((error) => {
+        Alert.alert(this.props.auth.errorMsg);
+      });
   };
 
   navigateSignup = () => {
@@ -71,6 +100,8 @@ export default class Login extends Component {
                       placeholder="Email"
                       placeholderTextColor="#00a8ff"
                       autoCapitalize="none"
+                      value={this.state.email}
+                      onChangeText={this.onEmailChange}
                     />
                     <TextInput
                       style={loginStyle.input}
@@ -78,11 +109,13 @@ export default class Login extends Component {
                       placeholder="Password"
                       placeholderTextColor="#00a8ff"
                       autoCapitalize="none"
+                      value={this.state.password}
+                      onChangeText={this.onPasswordChange}
                     />
                   </View>
                   <Button
                     title="Login"
-                    loading={this.state.btnLoading}
+                    loading={this.props.auth.isLoading}
                     onPress={this.handleSubmit}
                   />
                   <View style={loginStyle.signup}>
@@ -102,6 +135,13 @@ export default class Login extends Component {
     );
   }
 }
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+
+const mapDispatchToProps = {login};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
 
 const theme = {
   color: {

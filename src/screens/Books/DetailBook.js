@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, View, Text, Image} from 'react-native';
 import {Button, colors, ThemeProvider, Badge} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
-import book from '../assets/Empon.jpg';
+import book from '../../assets/Empon.jpg';
 export default class DetailBook extends Component {
   render() {
     return (
