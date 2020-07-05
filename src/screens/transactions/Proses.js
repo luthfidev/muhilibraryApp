@@ -1,66 +1,197 @@
 import React, {Component} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Header} from 'react-native-elements';
+import {
+  Text,
+  ActivityIndicator,
+  View,
+  SafeAreaView,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
+import {Header, Divider, Avatar} from 'react-native-elements';
+import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
-export default class History extends Component {
+import moment from 'moment';
+import {connect} from 'react-redux';
+import {
+  gettransactions,
+  updatetransactions,
+} from '../../redux/actions/transaction';
+class Proses extends Component {
   constructor() {
     super();
     this.state = {
+      isLoading: true,
+      dataTransactions: [],
+      refreshing: false,
+      currentSearch: 'Pending',
       search: '',
     };
   }
-  updateSearch = (search) => {
-    this.setState({search});
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData = async () => {
+    await this.props.gettransactions(
+      'search='.concat(this.state.currentSearch),
+    );
+    const {dataTransactions, isLoading} = this.props.transactions;
+    this.setState({dataTransactions, isLoading});
   };
 
-  /*   keyExtractor = (item) => String(item.id);
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.fetchData(this.state.currentSearch).then(() => {
+      this.setState({refreshing: false});
+    });
+  };
+
+  prosesTransaction = async (id) => {
+    this.setState({refreshing: true});
+    const data = {
+      statusid: 2,
+    };
+    await this.props.updatetransactions(id, data);
+    this.fetchData();
+    this.setState({refreshing: false});
+  };
+
+  rightSwipeOutButtons(id) {
+    return [
+      {
+        text: 'Remove',
+        backgroundColor: '#FF4500',
+        color: '#FFF',
+      },
+      {
+        onPress: () => this.prosesTransaction(id),
+        text: 'Proses',
+        backgroundColor: '#7FFF00',
+        color: '#000',
+      },
+    ];
+  }
+
   renderItem = ({item}) => (
-    <ListItem
-      title={`${item.firstName}`}
-      subtitle={item.job}
-      bottomDivider={true}
-    />
-  ); */
-
-  navigateAllTransactions = () => {
-    this.props.navigation.navigate('alltransactions');
-  };
-
-  render() {
-    return (
-      <View style={detailBookStyle.container}>
-        <Header
-          centerComponent={{
-            text: 'Transaction',
-            style: {color: '#fff'},
-          }}
-          rightComponent={
-            <Icon
-              name="paper"
-              color="#fff"
-              onPress={this.navigateAllTransactions}
-            />
-          }
-        />
-        <View>
-          {/*  <FlatList
-            data={data}
-            keyExtractor={this.keyExtractor}
-            renderItem={this.renderItem}
-          /> */}
+    <Swipeout
+      right={this.rightSwipeOutButtons(item.id)}
+      backgroundColor={'transparent'}
+      close>
+      <View style={TransactionStyle.item}>
+        <View style={TransactionStyle.pictureWrapper}>
+          <Avatar
+            rounded
+            size="large"
+            source={{
+              uri:
+                'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+            }}
+          />
+        </View>
+        <View style={TransactionStyle.textWrapper}>
+          <Text style={TransactionStyle.textName}>{item.name}</Text>
+          <Text style={TransactionStyle.textName}>
+            {moment(item.transaction_date).format('yyyy-MM-DD')}
+          </Text>
+          <View style={TransactionStyle.status}>
+            <Text style={{color: 'white'}}>{item.statusName}</Text>
+          </View>
         </View>
       </View>
+      <Divider style={{backgroundColor: 'grey'}} />
+    </Swipeout>
+  );
+
+  render() {
+    const {search, currentSearch, dataTransactions, isLoading} = this.state;
+    return (
+      <SafeAreaView style={TransactionStyle.container}>
+        {this.state.isLoading && (
+          <View style={TransactionStyle.loading}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        )}
+        {!this.state.isLoading && (
+          <>
+            <Header
+              centerComponent={{
+                text: 'On Proses',
+                style: {color: '#fff'},
+              }}
+              rightComponent={
+                <Icon
+                  name="paper"
+                  color="#fff"
+                  onPress={() =>
+                    this.props.navigation.navigate('alltransactions')
+                  }
+                />
+              }
+            />
+            <View>
+              <FlatList
+                data={dataTransactions}
+                keyExtractor={(item) => item.id}
+                onRefresh={() => this.fetchData({search: currentSearch})}
+                refreshing={isLoading}
+                renderItem={this.renderItem}
+                onEndReached={this.nextPage}
+                onEndReachedThreshold={0.5}
+              />
+            </View>
+          </>
+        )}
+      </SafeAreaView>
     );
   }
 }
-const detailBookStyle = StyleSheet.create({
+
+const mapStateToProps = (state) => ({
+  transactions: state.transactions,
+});
+
+const mapDispatchToProps = {
+  gettransactions,
+  updatetransactions,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Proses);
+
+const TransactionStyle = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f5f6fa',
   },
-  header: {
-    backgroundColor: '#00a8ff',
-    height: 400,
-    shadowColor: '#dcdde1',
+  item: {
+    height: 65,
+    flexDirection: 'row',
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingRight: 30,
+    margin: 15,
+  },
+  pictureWrapper: {
+    width: 65,
+    height: 65,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  textWrapper: {
+    justifyContent: 'center',
+  },
+  textName: {
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  status: {
+    alignItems: 'center',
+    backgroundColor: '#fa8231',
+    width: 70,
+    height: 20,
+    borderRadius: 5,
   },
 });

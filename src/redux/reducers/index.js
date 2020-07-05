@@ -7,6 +7,7 @@ import auth from './auth';
 import books from './book';
 import authors from './author';
 import genres from './genre';
+import transactions from './transaction';
 
 const persistConfig = {
   key: 'root',
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   books,
   authors,
   genres,
+  transactions,
 });
 
 // export default(rootReducer)
