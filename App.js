@@ -15,6 +15,9 @@ import AllTransactionsScreen from './src/screens/transactions/AllTransactions';
 // Profile
 import EditProfileScreen from './src/screens/Profiles/EditProfile';
 
+import GenresScreen from './src/screens/Genres/List';
+import AuthorsScreen from './src/screens/Authors/List';
+
 // Books
 import DetailBookScreen from './src/screens/Books/DetailBook';
 
@@ -73,6 +76,18 @@ export default class App extends Component {
                   options={{title: 'Profile', headerShown: false}}
                   component={EditProfileScreen}
                   name={'editprofile'}
+                />
+
+                {/* Menu */}
+                <Stack.Screen
+                  options={{title: 'Author', headerShown: false}}
+                  component={AuthorsScreen}
+                  name={'author'}
+                />
+                <Stack.Screen
+                  options={{title: 'Genre', headerShown: false}}
+                  component={GenresScreen}
+                  name={'genre'}
                 />
 
                 <Stack.Screen

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import {
   Avatar,
   Card,
@@ -20,18 +21,19 @@ import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
 import {logout} from '../../redux/actions/auth';
 const CardView = () => {
+  const navigation = useNavigation();
   return (
     <Card title="MENU">
       <View style={CardStyle.WrapperContent}>
         <View style={CardStyle.wrapperButton}>
           <ThemeProvider theme={theme}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('author')}>
               <Card>
                 <Icon name="create" color="#44bd32" />
                 <Text style={CardStyle.btnTitle}>Author</Text>
               </Card>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('genre')}>
               <Card>
                 <Icon name="pricetags" color="#44bd32" />
                 <Text style={CardStyle.btnTitle}>Genre</Text>

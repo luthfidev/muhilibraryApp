@@ -9,12 +9,11 @@ import {
   SafeAreaView,
   Platform,
   Image,
-  ScrollView,
   ActivityIndicator,
   BackHandler,
   FlatList,
 } from 'react-native';
-import {SearchBar, Header} from 'react-native-elements';
+import {SearchBar} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {getbooks} from '../../redux/actions/book';
 const {width: screenWidth} = Dimensions.get('window');
