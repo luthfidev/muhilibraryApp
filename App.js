@@ -3,7 +3,10 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from '@react-navigation/stack';
 
 // Auth
 import LoginScreen from './src/screens/Login';
@@ -43,7 +46,15 @@ export default class App extends Component {
         <Provider store={store}>
           <PersistGate persistor={persistor}>
             <NavigationContainer>
-              <Stack.Navigator>
+              <Stack.Navigator
+                /*  screenOptions={{
+                  gestureEnabled: false,
+                  gestureDirection: 'horizontal',
+                  cardStyleInterpolator:
+                    CardStyleInterpolators.forFadeFromBottomAndroid,
+                }} */
+                headerMode="float"
+                animation="fade">
                 <Stack.Screen
                   component={Login}
                   options={{
@@ -73,19 +84,40 @@ export default class App extends Component {
 
                 {/* Profile */}
                 <Stack.Screen
-                  options={{title: 'Profile', headerShown: false}}
+                  options={{
+                    title: 'Profile',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'vertical',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forModalPresentationIOS,
+                  }}
                   component={EditProfileScreen}
                   name={'editprofile'}
                 />
 
                 {/* Menu */}
                 <Stack.Screen
-                  options={{title: 'Author', headerShown: false}}
+                  options={{
+                    title: 'Author',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'vertical',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forModalPresentationIOS,
+                  }}
                   component={AuthorsScreen}
                   name={'author'}
                 />
                 <Stack.Screen
-                  options={{title: 'Genre', headerShown: false}}
+                  options={{
+                    title: 'Genre',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'vertical',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forModalPresentationIOS,
+                  }}
                   component={GenresScreen}
                   name={'genre'}
                 />

@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, FlatList} from 'react-native';
+import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
 import {SearchBar, ListItem, Header} from 'react-native-elements';
+import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
-import {getgenres} from '../../redux/actions/genre';
+import {getgenres, deletegenres} from '../../redux/actions/genre';
 class List extends Component {
   constructor() {
     super();
@@ -21,10 +22,43 @@ class List extends Component {
   }
 
   fetchData = async () => {
-    await this.props.getgenres('?page='.concat(this.state.currentPage));
+    await this.props.getgenres('limit=20page='.concat(this.state.currentPage));
     const {dataGenres, isLoading} = this.props.genres;
     this.setState({dataGenres, isLoading});
   };
+
+/*   _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.fetchData(this.state.currentPage).then(() => {
+      this.setState({refreshing: false});
+    });
+  }; */
+
+  updateSearch = (search) => {
+    this.setState({search});
+  };
+
+  deleteGenre = async (id) => {
+    const {token} = this.props.auth;
+    await this.props.deletegenres(token, id);
+    this.fetchData();
+  };
+
+  rightSwipeOutButtons(id) {
+    return [
+      {
+        onPress: () => this.deleteGenre(id),
+        text: 'Remove',
+        backgroundColor: '#FF4500',
+        color: '#FFF',
+      },
+      {
+        text: 'Edit',
+        backgroundColor: '#ffb142',
+        color: '#FFF',
+      },
+    ];
+  }
 
   nextPage = () => {
     this.setState({currentPage: this.state.currentPage + 1}, () => {
@@ -32,37 +66,32 @@ class List extends Component {
     });
   };
 
-  _onRefresh = () => {
-    this.setState({refreshing: true});
-    this.fetchData(this.state.currentPage).then(() => {
-      this.setState({refreshing: false});
-    });
-  };
-
-  updateSearch = (search) => {
-    this.setState({search});
-  };
-
   renderItem = ({item}) => (
-    <ListItem title={`${item.name}`} bottomDivider={true} />
+    <Swipeout
+      right={this.rightSwipeOutButtons(item.id)}
+      backgroundColor={'transparent'}
+      close>
+      <ListItem title={`${item.name}`} bottomDivider={true} />
+    </Swipeout>
   );
 
   render() {
     const {search, currentPage, dataGenres, isLoading} = this.state;
     return (
-      <View style={detailBookStyle.container}>
+      <View style={listStyle.container}>
         <Header
-          leftComponent={
-            <Icon
-              name="arrow-back"
-              color="white"
-              onPress={() => this.props.navigation.navigate('profile')}
-            />
+          centerComponent={
+            <TouchableOpacity>
+              <View style={listStyle.btnDown} />
+            </TouchableOpacity>
           }
-          centerComponent={{
-            text: 'Genres',
-            style: {color: '#fff'},
-          }}
+          rightComponent={
+            <View style={{padding: 5}}>
+              <Text style={{fontSize: 15, fontWeight: 'bold', color: 'white'}}>
+                Genres
+              </Text>
+            </View>
+          }
         />
         <SearchBar
           platform="android"
@@ -87,16 +116,25 @@ class List extends Component {
 }
 
 const mapStateToProps = (state) => ({
+  auth: state.auth,
   genres: state.genres,
 });
 
 const mapDispatchToProps = {
   getgenres,
+  deletegenres,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(List);
 
-const detailBookStyle = StyleSheet.create({
+const listStyle = StyleSheet.create({
+  btnDown: {
+    width: 90,
+    height: 10,
+    marginBottom: 50,
+    backgroundColor: '#f5f6fa',
+    borderRadius: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f6fa',

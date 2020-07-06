@@ -39,7 +39,7 @@ export default class History extends Component {
           }}
         />
         <SearchBar
-          platform="android"
+          platform="ios"
           placeholder="Type Here..."
           onChangeText={this.updateSearch}
           value={search}

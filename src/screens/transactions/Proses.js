@@ -58,11 +58,11 @@ class Proses extends Component {
 
   rightSwipeOutButtons(id) {
     return [
-      {
+      /*     {
         text: 'Remove',
         backgroundColor: '#FF4500',
         color: '#FFF',
-      },
+      }, */
       {
         onPress: () => this.prosesTransaction(id),
         text: 'Proses',

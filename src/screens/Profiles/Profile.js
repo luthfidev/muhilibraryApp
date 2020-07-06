@@ -76,9 +76,6 @@ const CardView = () => {
 };
 
 class Profile extends Component {
-  static navigationOptions = {
-    gesturesEnabled: true,
-  };
   navigateEditProfile = () => {
     this.props.navigation.navigate('editprofile');
   };
