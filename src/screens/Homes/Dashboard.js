@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-
 import Carousel from 'react-native-snap-carousel';
 import {
   View,
@@ -12,7 +11,9 @@ import {
   ActivityIndicator,
   BackHandler,
   FlatList,
+  TouchableOpacity,
 } from 'react-native';
+import {withNavigation} from '@react-navigation/compat';
 import {SearchBar} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {getbooks} from '../../redux/actions/book';
@@ -42,9 +43,9 @@ class Dashboard extends Component {
         isLoading: false,
       });
     }, 3000);
-    BackHandler.addEventListener('hardwareBackPress', function () {
+    /* BackHandler.addEventListener('hardwareBackPress', function () {
       return true;
-    });
+    }); */
   }
 
   componentDidMount() {
@@ -84,19 +85,23 @@ class Dashboard extends Component {
       </View>
     );
   }
-  _renderItemFlat({item, index}) {
+
+  _renderItemFlat = ({item, index}) => {
     return (
-      <View style={homeStyle.item}>
-        <View style={homeStyle.pictureWrapper}>
-          <Image style={homeStyle.picture} source={{uri: item.image}} />
+      <TouchableOpacity
+        onPress={() => this.props.navigation.navigate('detailbook')}>
+        <View style={homeStyle.item}>
+          <View style={homeStyle.pictureWrapper}>
+            <Image style={homeStyle.picture} source={{uri: item.image}} />
+          </View>
+          <View style={homeStyle.textWrapper}>
+            <Text style={homeStyle.textName}>{item.title}</Text>
+            <Text>{item.title}</Text>
+          </View>
         </View>
-        <View style={homeStyle.textWrapper}>
-          <Text style={homeStyle.textName}>{item.title}</Text>
-          <Text>{item.title}</Text>
-        </View>
-      </View>
+      </TouchableOpacity>
     );
-  }
+  };
 
   render() {
     const {search, currentPage, dataBooks, isLoading} = this.state;
@@ -165,7 +170,10 @@ const mapDispatchToProps = {
   getbooks,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withNavigation(Dashboard));
 
 const dashboardStyle = StyleSheet.create({
   loading: {

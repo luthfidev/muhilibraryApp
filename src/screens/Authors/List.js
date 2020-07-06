@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import {SearchBar, ListItem, Header} from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
@@ -46,8 +53,15 @@ class List extends Component {
 
   deleteAuthor = async (id) => {
     const {token} = this.props.auth;
-    await this.props.deleteauthors(token, id);
-    this.fetchData();
+    await this.props
+      .deleteauthors(token, id)
+      .then((response) => {
+        Alert.alert(this.props.authors.successMsg);
+        this.fetchData();
+      })
+      .catch((error) => {
+        Alert.alert(this.props.authors.errorMsg);
+      });
   };
 
   rightSwipeOutButtons(id) {
@@ -66,7 +80,7 @@ class List extends Component {
     ];
   }
 
-/*   nextPage = () => {
+  /*   nextPage = () => {
     this.setState({currentPage: this.state.currentPage + 1}, () => {
       this.fetchData({page: this.state.currentPage});
     });

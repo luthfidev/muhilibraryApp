@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import {SearchBar, ListItem, Header} from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
@@ -27,7 +34,7 @@ class List extends Component {
     this.setState({dataGenres, isLoading});
   };
 
-/*   _onRefresh = () => {
+  /*   _onRefresh = () => {
     this.setState({refreshing: true});
     this.fetchData(this.state.currentPage).then(() => {
       this.setState({refreshing: false});
@@ -40,7 +47,15 @@ class List extends Component {
 
   deleteGenre = async (id) => {
     const {token} = this.props.auth;
-    await this.props.deletegenres(token, id);
+    await this.props
+      .deletegenres(token, id)
+      .then((response) => {
+        Alert.alert(this.props.genres.successMsg);
+        this.fetchData();
+      })
+      .catch((error) => {
+        Alert.alert(this.props.genres.errorMsg);
+      });
     this.fetchData();
   };
 

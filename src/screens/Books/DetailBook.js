@@ -3,7 +3,9 @@ import {Platform, StyleSheet, View, Text, Image} from 'react-native';
 import {Button, colors, ThemeProvider, Badge} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
 import book from '../../assets/Empon.jpg';
-export default class DetailBook extends Component {
+import {connect} from 'react-redux';
+import {getbooks, detailbooks} from '../../redux/actions/book';
+class DetailBook extends Component {
   render() {
     return (
       <ThemeProvider theme={theme}>
@@ -42,6 +44,18 @@ export default class DetailBook extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  books: state.books,
+});
+
+const mapDispatchToProps = {
+  getbooks,
+  detailbooks,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(DetailBook);
 
 const theme = {
   color: {
