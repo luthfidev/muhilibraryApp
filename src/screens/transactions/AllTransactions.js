@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Text, View, SafeAreaView, FlatList, StyleSheet} from 'react-native';
-import {Header, ListItem, Divider, Avatar} from 'react-native-elements';
+import {Header, Card, Divider, Avatar} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
 import moment from 'moment';
 import {connect} from 'react-redux';
@@ -92,15 +92,22 @@ class AllTransactions extends Component {
           }}
         />
         <View>
-          <FlatList
-            data={dataTransactions}
-            keyExtractor={(item) => item.id}
-            onRefresh={() => this.fetchData({page: currentPage})}
-            refreshing={isLoading}
-            renderItem={this.renderItem}
-            onEndReached={this.nextPage}
-            onEndReachedThreshold={0.5}
-          />
+          {dataTransactions.length !== 0 && (
+            <FlatList
+              data={dataTransactions}
+              keyExtractor={(item) => item.id}
+              onRefresh={() => this.fetchData({page: currentPage})}
+              refreshing={isLoading}
+              renderItem={this.renderItem}
+              onEndReached={this.nextPage}
+              onEndReachedThreshold={0.5}
+            />
+          )}
+          {dataTransactions.length === 0 && (
+            <Card>
+              <Text>No have a transaction</Text>
+            </Card>
+          )}
         </View>
       </SafeAreaView>
     );

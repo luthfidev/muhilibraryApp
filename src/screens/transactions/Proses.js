@@ -7,7 +7,7 @@ import {
   FlatList,
   StyleSheet,
 } from 'react-native';
-import {Header, Divider, Avatar} from 'react-native-elements';
+import {Header, Divider, Avatar, Card} from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import moment from 'moment';
@@ -130,15 +130,22 @@ class Proses extends Component {
               }
             />
             <View>
-              <FlatList
-                data={dataTransactions}
-                keyExtractor={(item) => item.id}
-                onRefresh={() => this.fetchData({search: currentSearch})}
-                refreshing={isLoading}
-                renderItem={this.renderItem}
-                onEndReached={this.nextPage}
-                onEndReachedThreshold={0.5}
-              />
+              {dataTransactions.length !== 0 && (
+                <FlatList
+                  data={dataTransactions}
+                  keyExtractor={(item) => item.id}
+                  onRefresh={() => this.fetchData({search: currentSearch})}
+                  refreshing={isLoading}
+                  renderItem={this.renderItem}
+                  onEndReached={this.nextPage}
+                  onEndReachedThreshold={0.5}
+                />
+              )}
+              {dataTransactions.length === 0 && (
+                <Card>
+                  <Text>No have a transaction</Text>
+                </Card>
+              )}
             </View>
           </>
         )}

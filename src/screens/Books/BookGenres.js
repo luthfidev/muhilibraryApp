@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Carousel from 'react-native-snap-carousel';
 import {
   View,
   Text,
@@ -15,24 +14,23 @@ import {
 import qs from 'querystring';
 import _ from 'lodash';
 import {withNavigation} from '@react-navigation/compat';
-import {SearchBar, Divider, Badge} from 'react-native-elements';
+import {SearchBar, Card, Header} from 'react-native-elements';
+import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
 import {getbooks} from '../../redux/actions/book';
-import {getgenres} from '../../redux/actions/genre';
 import {ScrollView} from 'react-native-gesture-handler';
 const {width: screenWidth} = Dimensions.get('window');
 
 // data dummy
 /* import ENTRIES1 from '../../components/dataBook'; */
 
-class Dashboard extends Component {
+class BookGenres extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoading: true,
       dataBooks: [],
-      dataGenres: [],
-      dataCaraousel: [],
+      keyword: props.route.params,
       refreshing: false,
       currentPage: 1,
       search: '',
@@ -49,35 +47,17 @@ class Dashboard extends Component {
         isLoading: false,
       });
     }, 3000);
-    /* BackHandler.addEventListener('hardwareBackPress', function () {
-      return true;
-    }); */
   }
 
   componentDidMount() {
-    this.fetchDataCaraousel();
     this.fetchData();
-    this.fetchDataGenres();
   }
 
-  fetchDataCaraousel = async () => {
-    const {currentPage} = this.state;
-    await this.props.getbooks('page='.concat(currentPage));
-    const {dataBooks, isLoading} = this.props.books;
-    this.setState({dataCaraousel: dataBooks, isLoading});
-  };
-
   fetchData = async () => {
-    const {currentPage} = this.state;
-    await this.props.getbooks('page='.concat(currentPage));
+    const {currentPage, keyword} = this.state;
+    await this.props.getbooks(`search=${keyword}&page=${currentPage}`);
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataBooks, isLoading});
-  };
-
-  fetchDataGenres = async () => {
-    await this.props.getgenres();
-    const {dataGenres, isLoading} = this.props.genres;
-    this.setState({dataGenres, isLoading});
   };
 
   nextPage = () => {
@@ -100,22 +80,12 @@ class Dashboard extends Component {
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataBooks, isLoading});
   };
+
   handleSearchClear = async (e) => {
     await this.props.getbooks('search='.concat(''));
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataBooks, isLoading});
   };
-
-  _renderItem({item, index}) {
-    return (
-      <View style={dashboardStyle.item}>
-        <Image
-          style={dashboardStyle.imageContainer}
-          source={{uri: item.image}}
-        />
-      </View>
-    );
-  }
 
   _renderItemFlat = ({item, index}) => {
     return (
@@ -130,31 +100,8 @@ class Dashboard extends Component {
     );
   };
 
-  _renderItemGenres = ({item, index}) => {
-    return (
-      <TouchableOpacity
-        onPress={() => this.props.navigation.navigate('bookgenres', item.name)}>
-        <View style={genreStyle.item}>
-          <Badge
-            status="success"
-            size={20}
-            value={item.name}
-            textStyle={{fontSize: 14}}
-          />
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   render() {
-    const {
-      currentPage,
-      dataBooks,
-      dataGenres,
-      dataCaraousel,
-      isLoading,
-    } = this.state;
-    console.log(dataGenres);
+    const {currentPage, dataBooks, isLoading} = this.state;
     return (
       <SafeAreaView style={dashboardStyle.container}>
         {this.state.isLoading && (
@@ -165,6 +112,19 @@ class Dashboard extends Component {
         {!this.state.isLoading && (
           <>
             <View style={dashboardStyle.header}>
+              <Header
+                leftComponent={
+                  <Icon
+                    name="arrow-back"
+                    color="#fff"
+                    onPress={() => this.props.navigation.goBack()}
+                  />
+                }
+                centerComponent={{
+                  text: 'List Books',
+                  style: {color: '#fff'},
+                }}
+              />
               <SearchBar
                 platform="ios"
                 placeholder="Type Here..."
@@ -175,58 +135,28 @@ class Dashboard extends Component {
                 onCancel={this.handleSearchClear}
                 onClear={this.handleSearchClear}
               />
-              {/* get genre */}
-              <Text style={dashboardStyle.titlelist}>Genres</Text>
-              <FlatList
-                horizontal
-                style={genreStyle.container}
-                data={dataGenres}
-                renderItem={this._renderItemGenres}
-                keyExtractor={(item) => item.id.toString()}
-              />
-              <Divider style={{backgroundColor: 'grey'}} />
             </View>
             <ScrollView>
               <View style={dashboardStyle.booklist}>
                 <Text style={dashboardStyle.titlelist}>
-                  Top Recomended Book
+                  {this.state.keyword}
                 </Text>
-                <Carousel
-                  layout={'default'}
-                  activeSlideAlignment={'center'}
-                  loop={true}
-                  enableSnap={true}
-                  autoplay={true}
-                  autoplayInterval={3000}
-                  sliderWidth={screenWidth}
-                  sliderHeight={150}
-                  itemWidth={100}
-                  data={dataCaraousel}
-                  renderItem={this._renderItem}
-                />
-              </View>
-              <View style={dashboardStyle.booklist}>
-                <Text style={dashboardStyle.titlelist}>Romance</Text>
-                <FlatList
-                  horizontal
-                  style={dashboardStyle.booklist}
-                  data={dataBooks}
-                  renderItem={this._renderItemFlat}
-                  keyExtractor={(item) => item.email}
-                  onRefresh={() => this.fetchData({page: currentPage})}
-                  refreshing={isLoading}
-                />
-                <Divider style={{backgroundColor: 'grey'}} />
-                <FlatList
-                  horizontal
-                  style={dashboardStyle.booklist}
-                  data={dataBooks}
-                  renderItem={this._renderItemFlat}
-                  keyExtractor={(item) => item.email}
-                  onRefresh={() => this.fetchData({page: currentPage})}
-                  refreshing={isLoading}
-                />
-                <Divider style={{backgroundColor: 'grey'}} />
+                {dataBooks.length !== 0 && (
+                  <FlatList
+                    vertival
+                    style={dashboardStyle.booklist}
+                    data={dataBooks}
+                    renderItem={this._renderItemFlat}
+                    keyExtractor={(item) => item.email}
+                    onRefresh={() => this.fetchData({page: currentPage})}
+                    refreshing={isLoading}
+                  />
+                )}
+                {dataBooks.length === 0 && (
+                  <Card>
+                    <Text>No Found Book</Text>
+                  </Card>
+                )}
               </View>
             </ScrollView>
           </>
@@ -238,18 +168,16 @@ class Dashboard extends Component {
 
 const mapStateToProps = (state) => ({
   books: state.books,
-  genres: state.genres,
 });
 
 const mapDispatchToProps = {
   getbooks,
-  getgenres,
 };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withNavigation(Dashboard));
+)(withNavigation(BookGenres));
 
 const dashboardStyle = StyleSheet.create({
   loading: {

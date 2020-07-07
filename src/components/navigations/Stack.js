@@ -23,6 +23,7 @@ import AddAuthorsScreen from '../../screens/Authors/addAuthor';
 
 // Books
 import DetailBookScreen from '../../screens/Books/DetailBook';
+import BookGenresScreen from '../../screens/Books/BookGenres';
 
 // Bottom Tab
 import Tab from './Tab';
@@ -61,6 +62,11 @@ class Stack extends Component {
                   options={{title: 'Detail Book', headerShown: false}}
                   component={DetailBookScreen}
                   name={'detailbook'}
+                />
+                <Stacks.Screen
+                  options={{title: 'Books', headerShown: false}}
+                  component={BookGenresScreen}
+                  name={'bookgenres'}
                 />
                 {/* Transactions */}
                 <Stacks.Screen
