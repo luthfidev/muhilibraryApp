@@ -33,9 +33,6 @@ class Login extends Component {
       isLoading: true,
       btnLoading: false,
     };
-    if (this.props.auth.token) {
-      this.props.navigation.navigate('home');
-    }
   }
 
   UNSAFE_componentWillMount() {

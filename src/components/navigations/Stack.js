@@ -7,20 +7,22 @@ import {
 import {connect} from 'react-redux';
 
 // Auth
-import LoginScreen from '../screens/Login';
-import RegisterScreen from '../screens/Register';
+import LoginScreen from '../../screens/Login';
+import RegisterScreen from '../../screens/Register';
 
 // Transactions
-import AllTransactionsScreen from '../screens/transactions/AllTransactions';
+import AllTransactionsScreen from '../../screens/transactions/AllTransactions';
 
 // Profile
-import EditProfileScreen from '../screens/Profiles/EditProfile';
+import EditProfileScreen from '../../screens/Profiles/EditProfile';
 
-import GenresScreen from '../screens/Genres/List';
-import AuthorsScreen from '../screens/Authors/List';
+import GenresScreen from '../../screens/Genres/List';
+
+import AuthorsScreen from '../../screens/Authors/List';
+import AddAuthorsScreen from '../../screens/Authors/addAuthor';
 
 // Books
-import DetailBookScreen from '../screens/Books/DetailBook';
+import DetailBookScreen from '../../screens/Books/DetailBook';
 
 // Bottom Tab
 import Tab from './Tab';
@@ -98,6 +100,18 @@ class Stack extends Component {
                   }}
                   component={AuthorsScreen}
                   name={'author'}
+                />
+                <Stacks.Screen
+                  options={{
+                    title: 'Add Author',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'vertical',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forModalPresentationIOS,
+                  }}
+                  component={AddAuthorsScreen}
+                  name={'addauthor'}
                 />
                 <Stacks.Screen
                   options={{

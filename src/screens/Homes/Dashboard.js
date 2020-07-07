@@ -17,6 +17,7 @@ import {withNavigation} from '@react-navigation/compat';
 import {SearchBar} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {getbooks} from '../../redux/actions/book';
+import {ScrollView} from 'react-native-gesture-handler';
 const {width: screenWidth} = Dimensions.get('window');
 
 // data dummy
@@ -28,6 +29,7 @@ class Dashboard extends Component {
     this.state = {
       isLoading: true,
       dataBooks: [],
+      dataCaraousel: [],
       refreshing: false,
       currentPage: 1,
       search: '',
@@ -49,8 +51,15 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
+    this.fetchDataCaraousel();
     this.fetchData();
   }
+
+  fetchDataCaraousel = async () => {
+    await this.props.getbooks('?page='.concat(this.state.currentPage));
+    const {dataBooks, isLoading} = this.props.books;
+    this.setState({dataCaraousel: dataBooks, isLoading});
+  };
 
   fetchData = async () => {
     await this.props.getbooks('?page='.concat(this.state.currentPage));
@@ -89,14 +98,11 @@ class Dashboard extends Component {
   _renderItemFlat = ({item, index}) => {
     return (
       <TouchableOpacity
-        onPress={() => this.props.navigation.navigate('detailbook')}>
+        onPress={() => this.props.navigation.navigate('detailbook', item.id)}>
         <View style={homeStyle.item}>
           <View style={homeStyle.pictureWrapper}>
             <Image style={homeStyle.picture} source={{uri: item.image}} />
-          </View>
-          <View style={homeStyle.textWrapper}>
             <Text style={homeStyle.textName}>{item.title}</Text>
-            <Text>{item.title}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -104,7 +110,13 @@ class Dashboard extends Component {
   };
 
   render() {
-    const {search, currentPage, dataBooks, isLoading} = this.state;
+    const {
+      search,
+      currentPage,
+      dataBooks,
+      dataCaraousel,
+      isLoading,
+    } = this.state;
     return (
       <SafeAreaView style={dashboardStyle.container}>
         {this.state.isLoading && (
@@ -129,32 +141,96 @@ class Dashboard extends Component {
                 value={search}
               />
             </View>
-            <View style={dashboardStyle.booklist}>
-              <Text style={dashboardStyle.titlelist}>Top Recomended Book</Text>
-              <Carousel
-                layout={'default'}
-                activeSlideAlignment={'center'}
-                loop={true}
-                enableSnap={true}
-                autoplay={true}
-                autoplayInterval={3000}
-                sliderWidth={screenWidth}
-                sliderHeight={150}
-                itemWidth={100}
-                data={this.props.books.dataBooks}
-                renderItem={this._renderItem}
-              />
-            </View>
-            <FlatList
-              style={dashboardStyle.booklist}
-              data={dataBooks}
-              renderItem={this._renderItemFlat}
-              keyExtractor={(item) => item.email}
-              onRefresh={() => this.fetchData({page: currentPage})}
-              refreshing={isLoading}
-              onEndReached={this.nextPage}
-              onEndReachedThreshold={0.5}
-            />
+            <ScrollView>
+              <View style={dashboardStyle.booklist}>
+                <Text style={dashboardStyle.titlelist}>
+                  Top Recomended Book
+                </Text>
+                <Carousel
+                  layout={'default'}
+                  activeSlideAlignment={'center'}
+                  loop={true}
+                  enableSnap={true}
+                  autoplay={true}
+                  autoplayInterval={3000}
+                  sliderWidth={screenWidth}
+                  sliderHeight={150}
+                  itemWidth={100}
+                  data={dataCaraousel}
+                  renderItem={this._renderItem}
+                />
+              </View>
+              <View style={dashboardStyle.booklist}>
+                <Text style={dashboardStyle.titlelist}>Romance</Text>
+                <FlatList
+                  horizontal
+                  style={dashboardStyle.booklist}
+                  data={dataBooks}
+                  renderItem={this._renderItemFlat}
+                  keyExtractor={(item) => item.email}
+                  onRefresh={() => this.fetchData({page: currentPage})}
+                  refreshing={isLoading}
+                  onEndReached={this.nextPage}
+                  onEndReachedThreshold={0.5}
+                />
+              </View>
+              <View style={dashboardStyle.booklist}>
+                <Text style={dashboardStyle.titlelist}>Horror</Text>
+                <FlatList
+                  horizontal
+                  style={dashboardStyle.booklist}
+                  data={dataBooks}
+                  renderItem={this._renderItemFlat}
+                  keyExtractor={(item) => item.email}
+                  onRefresh={() => this.fetchData({page: currentPage})}
+                  refreshing={isLoading}
+                  onEndReached={this.nextPage}
+                  onEndReachedThreshold={0.5}
+                />
+              </View>
+              <View style={dashboardStyle.booklist}>
+                <Text style={dashboardStyle.titlelist}>Science</Text>
+                <FlatList
+                  horizontal
+                  style={dashboardStyle.booklist}
+                  data={dataBooks}
+                  renderItem={this._renderItemFlat}
+                  keyExtractor={(item) => item.email}
+                  onRefresh={() => this.fetchData({page: currentPage})}
+                  refreshing={isLoading}
+                  onEndReached={this.nextPage}
+                  onEndReachedThreshold={0.5}
+                />
+              </View>
+              <View style={dashboardStyle.booklist}>
+                <Text style={dashboardStyle.titlelist}>Anime</Text>
+                <FlatList
+                  horizontal
+                  style={dashboardStyle.booklist}
+                  data={dataBooks}
+                  renderItem={this._renderItemFlat}
+                  keyExtractor={(item) => item.email}
+                  onRefresh={() => this.fetchData({page: currentPage})}
+                  refreshing={isLoading}
+                  onEndReached={this.nextPage}
+                  onEndReachedThreshold={0.5}
+                />
+              </View>
+              <View style={dashboardStyle.booklist}>
+                <Text style={dashboardStyle.titlelist}>Sejarah</Text>
+                <FlatList
+                  horizontal
+                  style={dashboardStyle.booklist}
+                  data={dataBooks}
+                  renderItem={this._renderItemFlat}
+                  keyExtractor={(item) => item.email}
+                  onRefresh={() => this.fetchData({page: currentPage})}
+                  refreshing={isLoading}
+                  onEndReached={this.nextPage}
+                  onEndReachedThreshold={0.5}
+                />
+              </View>
+            </ScrollView>
           </>
         )}
       </SafeAreaView>
@@ -208,15 +284,14 @@ const dashboardStyle = StyleSheet.create({
     height: 150,
   },
   booklist: {
-    marginTop: 10,
-    marginBottom: 10,
+    margin: 10,
   },
 });
 
 const homeStyle = StyleSheet.create({
   item: {
-    height: 80,
-    flexDirection: 'row',
+    height: 300,
+    flexDirection: 'column',
     marginTop: 15,
     paddingTop: 5,
     paddingBottom: 5,
@@ -224,14 +299,14 @@ const homeStyle = StyleSheet.create({
     paddingLeft: 30,
   },
   pictureWrapper: {
-    width: 70,
-    height: 80,
+    width: 150,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
   },
   picture: {
-    height: 80,
-    width: 70,
+    width: 150,
+    height: 200,
     borderRadius: 5,
     backgroundColor: 'black',
   },
@@ -242,6 +317,6 @@ const homeStyle = StyleSheet.create({
   },
   textName: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 17,
   },
 });

@@ -1,42 +1,107 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, View, Text, Image} from 'react-native';
-import {Button, colors, ThemeProvider, Badge} from 'react-native-elements';
+import {Platform, StyleSheet, View, Text, Image, Alert} from 'react-native';
+import {
+  Button,
+  colors,
+  ThemeProvider,
+  Badge,
+  Header,
+} from 'react-native-elements';
+import moment from 'moment';
+import qs from 'querystring';
+
 import Icon from 'react-native-ionicons';
 import book from '../../assets/Empon.jpg';
 import {connect} from 'react-redux';
 import {getbooks, detailbooks} from '../../redux/actions/book';
+import {borrow} from '../../redux/actions/transaction';
 class DetailBook extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataBooks: [],
+      id: props.route.params,
+      transactiondate: moment().format('yyyy-MM-DD'),
+      editModalShow: false,
+      errorMsg: {},
+      isLoading: true,
+    };
+  }
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  handlePostBorrow = () => {
+    const {token} = this.props.auth;
+    const borrowData = {
+      bookid: this.state.bookid,
+      transactiondate: this.state.transactiondate,
+    };
+    this.props
+      .borrow(token, qs.stringify(borrowData))
+      .then((response) => {
+        Alert.alert(this.props.transactions.successMsg);
+        this.props.navigation.navigate('prosses');
+      })
+      .catch((error) => {
+        Alert.alert(this.props.transactions.errorMsg);
+      });
+  };
+
+  fetchData = async () => {
+    const {id} = this.state;
+    await this.props.detailbooks(id);
+    const {dataBooks, isLoading} = this.props.books;
+    this.setState({dataBooks, isLoading});
+    this.state.dataBooks.map((books, index) =>
+      this.setState({
+        bookid: books.id,
+        booktitle: books.title,
+        bookrelease: books.releaseDate,
+        bookgenreid: books.genreId,
+        bookgenre: books.genreName,
+        bookimage: books.image,
+        bookdesc: books.description,
+        bookauthorid: books.authorId,
+        bookauthor: books.authorName,
+        bookstatusid: books.nameStatusId,
+        bookstatus: books.nameStatus,
+      }),
+    );
+  };
   render() {
+    const {bookid, booktitle, bookimage, bookdesc, bookstatus} = this.state;
     return (
       <ThemeProvider theme={theme}>
+        <Header
+          leftComponent={
+            <Icon
+              name="arrow-back"
+              color="#fff"
+              onPress={() => this.props.navigation.goBack()}
+            />
+          }
+          centerComponent={{
+            text: 'Detail Book',
+            style: {color: '#fff'},
+          }}
+        />
         <View style={detailBookStyle.container}>
           <View style={detailBookStyle.header}>
-            <View style={detailBookStyle.actionBack}>
-              <Icon name="arrow-back" color="white" />
-              <Icon name="more" color="white" />
-            </View>
             <View style={detailBookStyle.bookImg}>
-              <Image source={book} style={detailBookStyle.image} />
-              <Text style={detailBookStyle.bookTitle}>Empon Empon</Text>
-              <Badge value="Available" status="warning" />
+              <Image source={{uri: bookimage}} style={detailBookStyle.image} />
+              <Text style={detailBookStyle.bookTitle}>{booktitle}</Text>
+              <Badge value={bookstatus} status="warning" />
             </View>
           </View>
           <View>
             <View>
-              <Text style={detailBookStyle.bookDesc}>
-                ais simply dummy text of the printing and typesetting industry.
-                Lorem Ipsum has been the industry's standard dummy text ever
-                since the 1500s, when an unknown printer took a galley of type
-                and scrambled it to make a type specimen book. It has survived
-                not only five centuries, but also the leap into electronic
-                typesetting, remaining essentially unchanged. It was popularised
-                in the 1960s with the release of Letraset sheets containing
-                Lorem Ipsum passages, and more recently with desktop publishing
-                software like Aldus PageMaker including versions of Lorem Ipsum
-              </Text>
+              <Text style={detailBookStyle.bookDesc}>{bookdesc}</Text>
             </View>
             <View style={detailBookStyle.btnBorrow}>
-              <Button title="Borrow" />
+              {bookstatus === 'Available' && (
+                <Button onPress={this.handlePostBorrow} title="Borrow" />
+              )}
             </View>
           </View>
         </View>
@@ -48,11 +113,13 @@ class DetailBook extends Component {
 const mapStateToProps = (state) => ({
   auth: state.auth,
   books: state.books,
+  transactions: state.transactions,
 });
 
 const mapDispatchToProps = {
   getbooks,
   detailbooks,
+  borrow,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(DetailBook);
@@ -82,8 +149,8 @@ const detailBookStyle = StyleSheet.create({
     backgroundColor: '#f5f6fa',
   },
   header: {
+    height: 300,
     backgroundColor: '#00a8ff',
-    height: 400,
     shadowColor: '#dcdde1',
   },
   avatar: {
@@ -114,6 +181,7 @@ const detailBookStyle = StyleSheet.create({
   image: {
     width: 150,
     height: 200,
+    marginTop: 12,
     marginBottom: 12,
     borderRadius: 5,
     shadowColor: '#000',

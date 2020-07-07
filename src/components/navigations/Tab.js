@@ -2,13 +2,13 @@ import React, {Component} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-ionicons';
 
-import DashboardScreen from '../screens/Homes/Dashboard';
+import DashboardScreen from '../../screens/Homes/Dashboard';
 
 // transactions
-import onProses from '../screens/transactions/Proses';
+import onProses from '../../screens/transactions/Proses';
 
-import HistoryScreen from '../screens/Profiles/History';
-import ProfileScreen from '../screens/Profiles/Profile';
+import HistoryScreen from '../../screens/Profiles/History';
+import ProfileScreen from '../../screens/Profiles/Profile';
 
 const BottomTab = createBottomTabNavigator();
 

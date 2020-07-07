@@ -26,6 +26,7 @@ class List extends Component {
 
   componentDidMount() {
     this.fetchData();
+    setInterval(this.fetchData, 5000);
   }
 
   fetchData = async () => {
@@ -100,6 +101,13 @@ class List extends Component {
     return (
       <View style={listStyle.container}>
         <Header
+          leftComponent={
+            <View style={{padding: 5}}>
+              <Text style={{fontSize: 15, fontWeight: 'bold', color: 'white'}}>
+                Authors
+              </Text>
+            </View>
+          }
           centerComponent={
             <TouchableOpacity>
               <View style={listStyle.btnDown} />
@@ -107,8 +115,10 @@ class List extends Component {
           }
           rightComponent={
             <View style={{padding: 5}}>
-              <Text style={{fontSize: 15, fontWeight: 'bold', color: 'white'}}>
-                Authors
+              <Text
+                onPress={() => this.props.navigation.navigate('addauthor')}
+                style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>
+                ADD
               </Text>
             </View>
           }
