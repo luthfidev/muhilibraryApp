@@ -10,13 +10,18 @@ import {
 import {Header, Input, Card, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
 
-import {postauthors} from '../../redux/actions/author';
-class addAuthor extends Component {
+import {
+  getauthors,
+  postauthors,
+  updateauthors,
+} from '../../redux/actions/author';
+class editAuthor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      description: '',
+      name: this.props.route.params.name,
+      description: this.props.route.params.description,
+      dataAuthors: [],
       isLoading: true,
       btnLoading: false,
     };
@@ -29,19 +34,16 @@ class addAuthor extends Component {
   };
 
   handleSubmit = async () => {
+    const id = this.props.route.params.id;
     const data = {
       name: this.state.name,
       description: this.state.description,
     };
     const {token} = this.props.auth;
     await this.props
-      .postauthors(token, data)
+      .updateauthors(token, id, data)
       .then((response) => {
         Alert.alert(this.props.authors.successMsg);
-        this.setState({
-          name: '',
-          description: '',
-        });
         this.props.navigation.navigate('author');
       })
       .catch((error) => {
@@ -50,6 +52,7 @@ class addAuthor extends Component {
   };
 
   render() {
+    const {name, description} = this.props.route.params;
     return (
       <SafeAreaView style={profileStyle.container}>
         <View style={profileStyle.header}>
@@ -62,7 +65,7 @@ class addAuthor extends Component {
           />
           <View style={{alignItems: 'center'}}>
             <Text style={{fontSize: 25, fontWeight: 'bold', marginTop: 10}}>
-              Add Author
+              Edit Author
             </Text>
           </View>
           <Card>
@@ -70,15 +73,17 @@ class addAuthor extends Component {
               <Input
                 label="Name Author"
                 onChangeText={this.onNameChange}
+                defaultValue={name}
                 /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
               />
               <Input
                 label="Description"
                 onChangeText={this.onDescriptionChange}
+                defaultValue={description}
                 /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
               />
               <Button
-                title="Save"
+                title="Update"
                 loading={this.props.authors.isLoading}
                 onPress={this.handleSubmit}
               />
@@ -95,9 +100,9 @@ const mapStateToProps = (state) => ({
   authors: state.authors,
 });
 
-const mapDispatchToProps = {postauthors};
+const mapDispatchToProps = {postauthors, getauthors, updateauthors};
 
-export default connect(mapStateToProps, mapDispatchToProps)(addAuthor);
+export default connect(mapStateToProps, mapDispatchToProps)(editAuthor);
 
 const profileStyle = StyleSheet.create({
   btnDown: {

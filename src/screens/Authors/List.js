@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import {withNavigation} from '@react-navigation/compat';
 import {SearchBar, ListItem, Header} from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
@@ -26,7 +27,13 @@ class List extends Component {
 
   componentDidMount() {
     this.fetchData();
-    setInterval(this.fetchData, 5000);
+  }
+
+  componentDidUpdate(prevProps) {
+    // don't forget to compare the props
+    if (this.props.authors.isSuccess !== prevProps.authors.isSuccess) {
+      this.fetchData();
+    }
   }
 
   fetchData = async () => {
@@ -65,7 +72,7 @@ class List extends Component {
       });
   };
 
-  rightSwipeOutButtons(id) {
+  rightSwipeOutButtons(id, name, description) {
     return [
       {
         onPress: () => this.deleteAuthor(id),
@@ -74,6 +81,8 @@ class List extends Component {
         color: '#FFF',
       },
       {
+        onPress: () =>
+          this.props.navigation.navigate('editauthor', id, name, description),
         text: 'Edit',
         backgroundColor: '#ffb142',
         color: '#FFF',
@@ -89,7 +98,11 @@ class List extends Component {
 
   renderItem = ({item}) => (
     <Swipeout
-      right={this.rightSwipeOutButtons(item.id)}
+      right={this.rightSwipeOutButtons({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+      })}
       backgroundColor={'transparent'}
       close>
       <ListItem title={`${item.name}`} bottomDivider={true} />
@@ -155,7 +168,10 @@ const mapDispatchToProps = {
   deleteauthors,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(List);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withNavigation(List));
 
 const listStyle = StyleSheet.create({
   btnDown: {

@@ -20,6 +20,7 @@ import GenresScreen from '../../screens/Genres/List';
 
 import AuthorsScreen from '../../screens/Authors/List';
 import AddAuthorsScreen from '../../screens/Authors/addAuthor';
+import EditAuthorsScreen from '../../screens/Authors/editAuthor';
 
 // Books
 import DetailBookScreen from '../../screens/Books/DetailBook';
@@ -118,6 +119,18 @@ class Stack extends Component {
                   }}
                   component={AddAuthorsScreen}
                   name={'addauthor'}
+                />
+                <Stacks.Screen
+                  options={{
+                    title: 'Edit Author',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'vertical',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forModalPresentationIOS,
+                  }}
+                  component={EditAuthorsScreen}
+                  name={'editauthor'}
                 />
                 <Stacks.Screen
                   options={{

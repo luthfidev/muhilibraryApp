@@ -1,4 +1,5 @@
 import http from '../../helpers/http';
+import qs from 'querystring';
 import {REACT_APP_URL} from 'react-native-dotenv';
 const url = `${REACT_APP_URL}`;
 
