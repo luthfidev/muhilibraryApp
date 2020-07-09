@@ -38,9 +38,6 @@ class Dashboard extends Component {
       search: '',
       query: '',
     };
-    /*  if (!this.props.auth.token) {
-      this.props.navigation.navigate('login');
-    } */
   }
 
   UNSAFE_componentWillMount() {
@@ -49,9 +46,6 @@ class Dashboard extends Component {
         isLoading: false,
       });
     }, 3000);
-    /* BackHandler.addEventListener('hardwareBackPress', function () {
-      return true;
-    }); */
   }
 
   componentDidMount() {
@@ -100,6 +94,7 @@ class Dashboard extends Component {
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataBooks, isLoading});
   };
+
   handleSearchClear = async (e) => {
     await this.props.getbooks('search='.concat(''));
     const {dataBooks, isLoading} = this.props.books;

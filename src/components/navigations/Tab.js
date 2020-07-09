@@ -36,7 +36,7 @@ export default class Tab extends Component {
           component={onProses}
           name="prosses"
         />
-        <BottomTab.Screen
+        {/*         <BottomTab.Screen
           options={{
             title: 'History',
             tabBarIcon: ({color, size}) => (
@@ -45,7 +45,7 @@ export default class Tab extends Component {
           }}
           component={HistoryScreen}
           name="history"
-        />
+        /> */}
         <BottomTab.Screen
           options={{
             title: 'Profile',

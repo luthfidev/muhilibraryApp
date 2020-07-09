@@ -29,7 +29,15 @@ class Proses extends Component {
   }
   componentDidMount() {
     this.fetchData();
-    setInterval(this.fetchData, 5000);
+  }
+
+  componentDidUpdate(prevProps) {
+    // don't forget to compare the props
+    if (
+      this.props.transactions.isSuccess !== prevProps.transactions.isSuccess
+    ) {
+      this.fetchData();
+    }
   }
 
   fetchData = async () => {

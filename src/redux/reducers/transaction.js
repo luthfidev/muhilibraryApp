@@ -138,6 +138,7 @@ const transactions = (state = initialState, action) => {
         ...state,
         isLoading: true,
         isError: false,
+        isSuccess: false,
       };
     }
     case 'POST_BORROW_REJECTED': {
@@ -145,6 +146,7 @@ const transactions = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
+        isSuccess: false,
         errorMsg: action.payload.response.data.message,
       };
     }
@@ -153,6 +155,7 @@ const transactions = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: false,
+        isSuccess: true,
         successMsg: action.payload.data.message,
       };
     }

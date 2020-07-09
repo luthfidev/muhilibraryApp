@@ -20,6 +20,15 @@ class AllTransactions extends Component {
     this.fetchData();
   }
 
+  componentDidUpdate(prevProps) {
+    // don't forget to compare the props
+    if (
+      this.props.transactions.isSuccess !== prevProps.transactions.isSuccess
+    ) {
+      this.fetchData();
+    }
+  }
+
   fetchData = async () => {
     await this.props.gettransactions(
       'limit=20page='.concat(this.state.currentPage),

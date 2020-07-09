@@ -2,9 +2,10 @@ const initialState = {
   dataAuthors: [],
   pageInfo: [],
   isLoading: false,
-  successMsg: '',
   isError: false,
+  isSuccess: false,
   errorMsg: '',
+  successMsg: '',
   token: null,
 };
 
@@ -67,6 +68,7 @@ const authors = (state = initialState, action) => {
         ...state,
         isLoading: true,
         isError: false,
+        isSuccess: false,
       };
     }
     case 'UPDATE_AUTHORS_REJECTED': {
@@ -74,6 +76,7 @@ const authors = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
+        isSuccess: false,
         errorMsg: action.payload.response.data.message,
       };
     }
@@ -82,6 +85,7 @@ const authors = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: false,
+        isSuccess: true,
         successMsg: action.payload.data.message,
       };
     }
@@ -91,6 +95,7 @@ const authors = (state = initialState, action) => {
         ...state,
         isLoading: true,
         isError: false,
+        isSuccess: false,
       };
     }
     case 'DELETE_AUTHORS_REJECTED': {
@@ -98,6 +103,7 @@ const authors = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
+        isSuccess: false,
         errorMsg: action.payload.response.data.message,
       };
     }
@@ -106,6 +112,8 @@ const authors = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: false,
+        isSuccess: true,
+        successMsg: action.payload.data.message,
       };
     }
     default: {

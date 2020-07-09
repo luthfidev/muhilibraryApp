@@ -13,14 +13,17 @@ import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
 import {getauthors, deleteauthors} from '../../redux/actions/author';
+import {clearmessage} from '../../redux/actions/clear';
 class List extends Component {
   constructor() {
     super();
     this.state = {
       isLoading: true,
       dataAuthors: [],
+      pageInfo: [],
       refreshing: false,
-      currentPage: 1,
+      page: 1,
+      loadingMore: false,
       search: '',
     };
   }
@@ -32,26 +35,18 @@ class List extends Component {
   componentDidUpdate(prevProps) {
     // don't forget to compare the props
     if (this.props.authors.isSuccess !== prevProps.authors.isSuccess) {
-      this.fetchData();
+      this.onRefresh();
     }
   }
 
   fetchData = async () => {
-    await this.props.getauthors('limit=20page='.concat(this.state.currentPage));
-    const {dataAuthors, isLoading} = this.props.authors;
-    this.setState({dataAuthors, isLoading});
-  };
-
-  nextPage = () => {
-    this.setState({currentPage: this.state.currentPage + 1}, () => {
-      this.fetchData({page: this.state.currentPage});
-    });
-  };
-
-  _onRefresh = () => {
-    this.setState({refreshing: true});
-    this.fetchData(this.state.currentPage).then(() => {
-      this.setState({refreshing: false});
+    console.log(this.state.page);
+    await this.props.getauthors(`limit=5&page=${this.state.page}`);
+    const {dataAuthors, pageInfo, isLoading} = await this.props.authors;
+    this.setState({
+      dataAuthors: this.state.dataAuthors.concat(dataAuthors),
+      pageInfo,
+      isLoading,
     });
   };
 
@@ -65,24 +60,22 @@ class List extends Component {
       .deleteauthors(token, id)
       .then((response) => {
         Alert.alert(this.props.authors.successMsg);
-        this.fetchData();
       })
       .catch((error) => {
         Alert.alert(this.props.authors.errorMsg);
       });
   };
 
-  rightSwipeOutButtons(id, name, description) {
+  rightSwipeOutButtons({item}) {
     return [
       {
-        onPress: () => this.deleteAuthor(id),
+        onPress: () => this.deleteAuthor(item.id),
         text: 'Remove',
         backgroundColor: '#FF4500',
         color: '#FFF',
       },
       {
-        onPress: () =>
-          this.props.navigation.navigate('editauthor', id, name, description),
+        onPress: () => this.props.navigation.navigate('editauthor', item),
         text: 'Edit',
         backgroundColor: '#ffb142',
         color: '#FFF',
@@ -90,27 +83,50 @@ class List extends Component {
     ];
   }
 
-  /*   nextPage = () => {
-    this.setState({currentPage: this.state.currentPage + 1}, () => {
-      this.fetchData({page: this.state.currentPage});
+  onRefresh = async () => {
+    this.setState({page: 1});
+    await this.props.getauthors(`limit=5&page=${this.state.page}`);
+    const {dataAuthors, isLoading} = this.props.authors;
+    this.setState({
+      dataAuthors: dataAuthors,
+      isLoading,
     });
-  }; */
+  };
 
-  renderItem = ({item}) => (
+  // Handle searchbar
+  handleSearch = async (e) => {
+    const {search} = this.state;
+    await this.props.getauthors('search='.concat(search.toLowerCase()));
+    const {dataAuthors, isLoading} = this.props.authors;
+    this.setState({dataAuthors, isLoading});
+  };
+
+  handleSearchClear = async (e) => {
+    this.setState({page: 1});
+    await this.props.getauthors(`page=${this.state.page}&search=`.concat(''));
+    const {dataAuthors, isLoading} = this.props.authors;
+    this.setState({dataAuthors, isLoading});
+  };
+
+  loadMore = () => {
+    this.setState({page: this.state.page + 1}, () => {
+      this.fetchData({page: this.state.page});
+    });
+  };
+
+  renderItem = ({item, index}) => (
     <Swipeout
       right={this.rightSwipeOutButtons({
-        id: item.id,
-        name: item.name,
-        description: item.description,
+        item,
       })}
       backgroundColor={'transparent'}
       close>
-      <ListItem title={`${item.name}`} bottomDivider={true} />
+      <ListItem key={index} title={`${item.name}`} bottomDivider={true} />
     </Swipeout>
   );
 
   render() {
-    const {search, currentPage, dataAuthors, isLoading} = this.state;
+    const {search, page, dataAuthors, isLoading} = this.state;
     return (
       <View style={listStyle.container}>
         <Header
@@ -137,22 +153,25 @@ class List extends Component {
           }
         />
         <SearchBar
-          platform="android"
+          platform="ios"
           placeholder="Type Here..."
-          onChangeText={this.updateSearch}
-          value={search}
+          value={this.state.search}
+          onChangeText={(search) => this.setState({search})}
+          returnKeyType={'search'}
+          onSubmitEditing={this.handleSearch}
+          onCancel={this.handleSearchClear}
+          onClear={this.handleSearchClear}
         />
-        <View>
-          <FlatList
-            data={dataAuthors}
-            keyExtractor={(item) => item.id}
-            onRefresh={() => this.fetchData({page: currentPage})}
-            refreshing={isLoading}
-            renderItem={this.renderItem}
-            onEndReached={this.nextPage}
-            onEndReachedThreshold={0.5}
-          />
-        </View>
+
+        <FlatList
+          keyExtractor={(item, index) => index.toString()}
+          data={dataAuthors}
+          onRefresh={this.loadMore}
+          refreshing={isLoading}
+          renderItem={this.renderItem}
+          onEndReached={this.loadMore}
+          onEndReachedThreshold={0.5}
+        />
       </View>
     );
   }
@@ -161,11 +180,13 @@ class List extends Component {
 const mapStateToProps = (state) => ({
   auth: state.auth,
   authors: state.authors,
+  clear: state.clear,
 });
 
 const mapDispatchToProps = {
   getauthors,
   deleteauthors,
+  clearmessage,
 };
 
 export default connect(

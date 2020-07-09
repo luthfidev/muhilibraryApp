@@ -77,11 +77,7 @@ class addAuthor extends Component {
                 onChangeText={this.onDescriptionChange}
                 /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
               />
-              <Button
-                title="Save"
-                loading={this.props.authors.isLoading}
-                onPress={this.handleSubmit}
-              />
+              <Button title="Save" onPress={this.handleSubmit} />
             </View>
           </Card>
         </View>
