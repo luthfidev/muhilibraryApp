@@ -10,9 +10,33 @@ import {
 } from 'react-native';
 import {Header, Input, Card, CheckBox, Button} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
-export default class Profile extends Component {
-  navigateProfile = () => {
-    this.props.navigation.navigate('profile');
+import {connect} from 'react-redux';
+import moment from 'moment';
+import {getusersid} from '../../redux/actions/user';
+
+class EditProfile extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: this.props.route.params,
+    };
+  }
+  componentDidMount() {
+    this.fetchData();
+  }
+  fetchData = async () => {
+    const {token} = this.props.auth;
+    const id = this.state.id;
+    await this.props.getusersid(token, id);
+    const {dataUsers, isLoading} = this.props.users;
+    this.setState({dataUsers, isLoading});
+    this.state.dataUsers.map((users, index) =>
+      this.setState({
+        name: users.name,
+        birthdate: moment(users.birthdate).format('yyyy-MM-DD'),
+        gender: users.gender,
+      }),
+    );
   };
   render() {
     return (
@@ -34,10 +58,12 @@ export default class Profile extends Component {
             <View style={profileStyle.WrapperForm}>
               <Input
                 label="Full Name"
+                defaultValue={this.state.name}
                 /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
               />
               <Input
                 label="Birthdate"
+                defaultValue={this.state.birthdate}
                 /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
               />
               <View
@@ -46,7 +72,7 @@ export default class Profile extends Component {
                   flexDirection: 'row',
                   marginBottom: 20,
                 }}>
-                <CheckBox
+                {/* <CheckBox
                   center
                   title="Male"
                   checkedIcon="dot-circle-o"
@@ -57,6 +83,11 @@ export default class Profile extends Component {
                   title="Female"
                   checkedIcon="dot-circle-o"
                   uncheckedIcon="circle-o"
+                /> */}
+                <Input
+                  label="Gender"
+                  defaultValue={this.state.gender}
+                  /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
                 />
               </View>
               <Button title="Save" />
@@ -68,6 +99,15 @@ export default class Profile extends Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  users: state.users,
+});
+
+const mapDispatchToProps = {
+  getusersid,
+};
+export default connect(mapStateToProps, mapDispatchToProps)(EditProfile);
 const profileStyle = StyleSheet.create({
   btnDown: {
     width: 90,

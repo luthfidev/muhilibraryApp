@@ -47,7 +47,12 @@ class Stack extends Component {
                 <Stacks.Screen
                   component={RegisterScreen}
                   options={{
+                    title: 'Register',
                     headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'vertical',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forModalPresentationIOS,
                   }}
                   name={'register'}
                 />

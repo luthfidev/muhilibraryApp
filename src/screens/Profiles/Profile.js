@@ -19,7 +19,13 @@ import {
 } from 'react-native-elements';
 import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
+import jwt_decode from 'jwt-decode';
+import moment from 'moment';
+import {REACT_APP_URL} from 'react-native-dotenv';
+const url = `${REACT_APP_URL}`;
 import {logout} from '../../redux/actions/auth';
+import {getusersid} from '../../redux/actions/user';
+
 const CardView = () => {
   const navigation = useNavigation();
   return (
@@ -76,14 +82,46 @@ const CardView = () => {
 };
 
 class Profile extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataUsers: [],
+      isLoading: false,
+      user: jwt_decode(this.props.auth.token) || {
+        email: '',
+        role: '',
+      },
+    };
+  }
   navigateEditProfile = () => {
-    this.props.navigation.navigate('editprofile');
+    const {id} = this.state.user;
+    this.props.navigation.navigate('editprofile', id);
   };
+
+  componentDidMount() {
+    this.fetchData();
+  }
 
   onLogout = async () => {
     const {token} = this.props.auth;
     await this.props.logout(token);
     this.props.navigation.navigate('login');
+  };
+
+  fetchData = async () => {
+    const {token} = this.props.auth;
+    const {id} = this.state.user;
+    await this.props.getusersid(token, id);
+    const {dataUsers, isLoading} = this.props.users;
+    this.setState({dataUsers, isLoading});
+    this.state.dataUsers.map((users, index) =>
+      this.setState({
+        name: users.name,
+        picture: users.picture,
+        birthdate: moment(users.birthdate).format('yyyy-MM-DD'),
+        gender: users.gender,
+      }),
+    );
   };
 
   render() {
@@ -104,14 +142,15 @@ class Profile extends Component {
               rounded
               size={125}
               source={{
-                uri:
-                  'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+                uri: url + this.state.picture,
               }}
             />
             <View style={profileStyle.wrapperBiodata}>
-              <Text style={profileStyle.BiodataText}>Prima Dana D</Text>
-              <Text style={profileStyle.BiodataText}>Birthdate</Text>
-              <Text style={profileStyle.BiodataText}>Gender</Text>
+              <Text style={profileStyle.BiodataText}>{this.state.name}</Text>
+              <Text style={profileStyle.BiodataText}>
+                {this.state.birthdate}
+              </Text>
+              <Text style={profileStyle.BiodataText}>{this.state.gender}</Text>
             </View>
           </View>
         </View>
@@ -134,10 +173,12 @@ class Profile extends Component {
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
+  users: state.users,
 });
 
 const mapDispatchToProps = {
   logout,
+  getusersid,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

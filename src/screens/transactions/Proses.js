@@ -16,6 +16,7 @@ import {
   gettransactions,
   updatetransactions,
 } from '../../redux/actions/transaction';
+import {userhistory} from '../../redux/actions/user';
 class Proses extends Component {
   constructor() {
     super();
@@ -41,11 +42,16 @@ class Proses extends Component {
   }
 
   fetchData = async () => {
-    await this.props.gettransactions(
-      'search='.concat(this.state.currentSearch),
-    );
-    const {dataTransactions, isLoading} = this.props.transactions;
-    this.setState({dataTransactions, isLoading});
+    const {token} = this.props.auth;
+    await this.props
+      .userhistory(token, 'search=Pending')
+      .then((response) => {
+        const {dataHistoryUsers, isLoading} = this.props.users;
+        this.setState({dataTransactions: dataHistoryUsers, isLoading});
+      })
+      .catch((error) => {
+        this.setState({dataTransactions: [], isLoading: false});
+      });
   };
 
   _onRefresh = () => {
@@ -164,11 +170,14 @@ class Proses extends Component {
 
 const mapStateToProps = (state) => ({
   transactions: state.transactions,
+  users: state.users,
+  auth: state.auth,
 });
 
 const mapDispatchToProps = {
   gettransactions,
   updatetransactions,
+  userhistory,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Proses);

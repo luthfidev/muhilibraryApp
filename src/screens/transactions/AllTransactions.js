@@ -5,6 +5,7 @@ import Icon from 'react-native-ionicons';
 import moment from 'moment';
 import {connect} from 'react-redux';
 import {gettransactions} from '../../redux/actions/transaction';
+import {userhistory} from '../../redux/actions/user';
 class AllTransactions extends Component {
   constructor() {
     super();
@@ -30,11 +31,16 @@ class AllTransactions extends Component {
   }
 
   fetchData = async () => {
-    await this.props.gettransactions(
-      'limit=20page='.concat(this.state.currentPage),
-    );
-    const {dataTransactions, isLoading} = this.props.transactions;
-    this.setState({dataTransactions, isLoading});
+    const {token} = this.props.auth;
+    await this.props
+      .userhistory(token, 'limit=20page='.concat(this.state.currentPage))
+      .then((response) => {
+        const {dataHistoryUsers, isLoading} = this.props.users;
+        this.setState({dataTransactions: dataHistoryUsers, isLoading});
+      })
+      .catch((error) => {
+        this.setState({dataTransactions: [], isLoading: false});
+      });
   };
 
   nextPage = () => {
@@ -125,10 +131,13 @@ class AllTransactions extends Component {
 
 const mapStateToProps = (state) => ({
   transactions: state.transactions,
+  users: state.users,
+  auth: state.auth,
 });
 
 const mapDispatchToProps = {
   gettransactions,
+  userhistory,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AllTransactions);

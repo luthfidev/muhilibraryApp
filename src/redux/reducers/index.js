@@ -8,13 +8,15 @@ import books from './book';
 import authors from './author';
 import genres from './genre';
 import transactions from './transaction';
+import users from './user';
+import clear from './clear';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
   stateReconciler: hardSet,
   debug: false,
-  whitelist: ['auth'],
+  whitelist: ['auth', 'clear'],
 };
 
 const rootReducer = combineReducers({
@@ -23,6 +25,8 @@ const rootReducer = combineReducers({
   authors,
   genres,
   transactions,
+  users,
+  clear,
 });
 
 // export default(rootReducer)
