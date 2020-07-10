@@ -11,15 +11,18 @@ import {
   ActivityIndicator,
   FlatList,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import qs from 'querystring';
 import _ from 'lodash';
 import {withNavigation} from '@react-navigation/compat';
-import {SearchBar, Divider, Badge} from 'react-native-elements';
+import {SearchBar, Divider, Badge, withTheme} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {getbooks} from '../../redux/actions/book';
 import {getgenres} from '../../redux/actions/genre';
+import Logo from '../../assets/dmy.jpg';
 import {ScrollView} from 'react-native-gesture-handler';
+
 const {width: screenWidth} = Dimensions.get('window');
 
 // data dummy
@@ -56,14 +59,14 @@ class Dashboard extends Component {
 
   fetchDataCaraousel = async () => {
     const {currentPage} = this.state;
-    await this.props.getbooks('page='.concat(currentPage));
+    await this.props.getbooks('limit=10');
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataCaraousel: dataBooks, isLoading});
   };
 
   fetchData = async () => {
     const {currentPage} = this.state;
-    await this.props.getbooks('page='.concat(currentPage));
+    await this.props.getbooks('limit=20');
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataBooks, isLoading});
   };
@@ -90,7 +93,7 @@ class Dashboard extends Component {
   // Handle searchbar
   handleSearch = async (e) => {
     const {search} = this.state;
-    await this.props.getbooks('search='.concat(search.toLowerCase()));
+    await this.props.getbooks('limit=20&search='.concat(search.toLowerCase()));
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataBooks, isLoading});
   };
@@ -118,7 +121,9 @@ class Dashboard extends Component {
         onPress={() => this.props.navigation.navigate('detailbook', item.id)}>
         <View style={homeStyle.item}>
           <View style={homeStyle.pictureWrapper}>
-            <Image style={homeStyle.picture} source={{uri: item.image}} />
+            <ImageBackground style={homeStyle.picture} source={Logo}>
+              <Image style={homeStyle.picture} source={{uri: item.image}} />
+            </ImageBackground>
           </View>
         </View>
       </TouchableOpacity>
@@ -130,12 +135,9 @@ class Dashboard extends Component {
       <TouchableOpacity
         onPress={() => this.props.navigation.navigate('bookgenres', item.name)}>
         <View style={genreStyle.item}>
-          <Badge
-            status="success"
-            size={20}
-            value={item.name}
-            textStyle={{fontSize: 14}}
-          />
+          <View style={genreStyle.badge}>
+            <Text style={genreStyle.text}>{item.name}</Text>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -302,7 +304,6 @@ const homeStyle = StyleSheet.create({
     width: 150,
     height: 200,
     borderRadius: 5,
-    backgroundColor: 'black',
   },
   textWrapper: {
     justifyContent: 'center',
@@ -320,8 +321,17 @@ const genreStyle = StyleSheet.create({
     width: screenWidth,
   },
   item: {
-    height: 20,
+    height: 25,
     width: 70,
     margin: 10,
+  },
+  badge: {
+    padding: 5,
+    backgroundColor: 'green',
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  text: {
+    color: 'white',
   },
 });
