@@ -18,6 +18,7 @@ import _ from 'lodash';
 import {withNavigation} from '@react-navigation/compat';
 import {SearchBar, Divider, Badge, withTheme} from 'react-native-elements';
 import {connect} from 'react-redux';
+import SplashScreen from 'react-native-splash-screen';
 import {getbooks} from '../../redux/actions/book';
 import {getgenres} from '../../redux/actions/genre';
 import Logo from '../../assets/dmy.jpg';
@@ -43,18 +44,19 @@ class Dashboard extends Component {
     };
   }
 
-  UNSAFE_componentWillMount() {
+  /*   UNSAFE_componentWillMount() {
     setTimeout(() => {
       this.setState({
         isLoading: false,
       });
     }, 3000);
-  }
+  } */
 
-  componentDidMount() {
-    this.fetchDataCaraousel();
-    this.fetchData();
-    this.fetchDataGenres();
+  async componentDidMount() {
+    await this.fetchDataCaraousel();
+    await this.fetchData();
+    await this.fetchDataGenres();
+    SplashScreen.hide();
   }
 
   fetchDataCaraousel = async () => {

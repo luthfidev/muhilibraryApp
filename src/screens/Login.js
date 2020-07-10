@@ -12,6 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import {colors, ThemeProvider} from 'react-native-elements';
+import SplashScreen from 'react-native-splash-screen';
 import {connect} from 'react-redux';
 
 import {login} from '../redux/actions/auth';
@@ -28,11 +29,11 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true,
+      isLoading: false,
     };
   }
 
-  UNSAFE_componentWillMount() {
+  /*  UNSAFE_componentWillMount() {
     setTimeout(() => {
       this.setState({
         error: null,
@@ -40,6 +41,9 @@ class Login extends Component {
         isLoading: false,
       });
     }, 3000);
+  } */
+  componentDidMount() {
+    SplashScreen.hide();
   }
 
   render() {
