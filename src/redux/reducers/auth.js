@@ -1,9 +1,9 @@
 const initialState = {
   isLoading: false,
   isLogin: false,
-  successMsg: '',
+  isSuccess: false,
   isError: false,
-  errorMsg: '',
+  msg: '',
   token: null,
 };
 
@@ -14,6 +14,7 @@ const auth = (state = initialState, action) => {
         ...state,
         isLoading: true,
         isError: false,
+        isSuccess: false,
       };
     }
     case 'LOGIN_REJECTED': {
@@ -21,7 +22,8 @@ const auth = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
-        errorMsg: action.payload.response.data.message,
+        isSuccess: false,
+        msg: action.payload.response.data.message,
       };
     }
     case 'LOGIN_FULFILLED': {
@@ -30,9 +32,9 @@ const auth = (state = initialState, action) => {
         isLogin: true,
         isLoading: false,
         isError: false,
-
+        isSuccess: true,
         token: action.payload.data.token,
-        successMsg: action.payload.data.message,
+        msg: action.payload.data.message,
       };
     }
     case 'REGISTER_PENDING': {
@@ -47,7 +49,7 @@ const auth = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
-        errorMsg: action.payload.response.data.message,
+        msg: action.payload.response.data.message,
       };
     }
     case 'REGISTER_FULFILLED': {
@@ -55,7 +57,7 @@ const auth = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: false,
-        successMsg: action.payload.data.message,
+        msg: action.payload.data.message,
       };
     }
     case 'LOGOUT_PENDING': {
@@ -70,7 +72,7 @@ const auth = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
-        errorMsg: action.payload.response.data.message,
+        msg: action.payload.response.data.message,
       };
     }
     case 'LOGOUT_FULFILLED': {

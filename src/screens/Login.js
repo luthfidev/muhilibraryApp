@@ -4,7 +4,6 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   SafeAreaView,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
@@ -12,11 +11,12 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import {Button, colors, ThemeProvider} from 'react-native-elements';
+import {colors, ThemeProvider} from 'react-native-elements';
 import {connect} from 'react-redux';
 
 import {login} from '../redux/actions/auth';
 import Logo from '../components/Logo';
+import FormLogin from '../components/Auth/FormLogin';
 
 const DismissKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -28,10 +28,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
-      password: '',
       isLoading: true,
-      btnLoading: false,
     };
   }
 
@@ -44,34 +41,6 @@ class Login extends Component {
       });
     }, 3000);
   }
-
-  onEmailChange = (email) => {
-    this.setState({email});
-  };
-  onPasswordChange = (password) => {
-    this.setState({password});
-  };
-
-  handleSubmit = async () => {
-    const {email, password} = this.state;
-    await this.props
-      .login(email, password)
-      .then((response) => {
-        Alert.alert(this.props.auth.successMsg);
-        this.setState({
-          email: '',
-          password: '',
-        });
-        this.props.navigation.navigate('home');
-      })
-      .catch((error) => {
-        Alert.alert(this.props.auth.errorMsg);
-      });
-  };
-
-  navigateSignup = () => {
-    this.props.navigation.navigate('register');
-  };
 
   render() {
     return (
@@ -89,40 +58,14 @@ class Login extends Component {
                   <Logo />
                   <Text style={loginStyle.logotext}>Log In</Text>
                 </View>
-                <View style={loginStyle.form}>
-                  <View style={loginStyle.field}>
-                    <TextInput
-                      style={loginStyle.input}
-                      underlineColorAndroid="transparent"
-                      placeholder="Email"
-                      placeholderTextColor="#00a8ff"
-                      autoCapitalize="none"
-                      value={this.state.email}
-                      onChangeText={this.onEmailChange}
-                    />
-                    <TextInput
-                      style={loginStyle.input}
-                      underlineColorAndroid="transparent"
-                      placeholder="Password"
-                      placeholderTextColor="#00a8ff"
-                      autoCapitalize="none"
-                      value={this.state.password}
-                      onChangeText={this.onPasswordChange}
-                    />
-                  </View>
-                  <Button
-                    title="Login"
-                    loading={this.props.auth.isLoading}
-                    onPress={this.handleSubmit}
-                  />
-                  <View style={loginStyle.signup}>
-                    <Text>Don't have account ?</Text>
-                    <Text
-                      style={loginStyle.btnSignup}
-                      onPress={this.navigateSignup}>
-                      Sign Up
-                    </Text>
-                  </View>
+                <FormLogin />
+                <View style={loginStyle.signup}>
+                  <Text>Don't have account ?</Text>
+                  <Text
+                    style={loginStyle.btnSignup}
+                    onPress={() => this.props.navigation.navigate('register')}>
+                    Sign Up
+                  </Text>
                 </View>
               </KeyboardAvoidingView>
             )}
@@ -177,37 +120,9 @@ const loginStyle = StyleSheet.create({
     color: '#e84118',
     textDecorationLine: 'underline',
   },
-  form: {
-    alignItems: 'center',
-  },
-  field: {
-    width: 300,
-  },
-  input: {
-    margin: 10,
-    height: 45,
-    borderColor: '#0097e6',
-    borderWidth: 1,
-    borderRadius: 30,
-    paddingLeft: 15,
-  },
-  button: {
-    width: 200,
-    height: 20,
-    marginTop: 15,
-    borderRadius: 15,
-    padding: 25,
-    backgroundColor: '#0097e6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  btntext: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#f5f6fa',
-  },
   signup: {
     marginTop: 25,
+    justifyContent: 'center',
     flexDirection: 'row',
   },
   btnSignup: {
