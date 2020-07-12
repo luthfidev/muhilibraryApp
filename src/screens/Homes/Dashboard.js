@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
+import jwt_decode from 'jwt-decode';
 import {withNavigation} from '@react-navigation/compat';
 import {SearchBar, Divider, Header, Card} from 'react-native-elements';
 import {connect} from 'react-redux';
@@ -31,6 +32,7 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      dataUsers: [],
       isLoading: true,
       dataBooks: [],
       dataGenres: [],
@@ -38,7 +40,7 @@ class Dashboard extends Component {
       refreshing: false,
       currentPage: 1,
       search: '',
-      query: '',
+      user: jwt_decode(this.props.auth.token),
     };
   }
 
@@ -47,6 +49,10 @@ class Dashboard extends Component {
     await this.fetchData();
     await this.fetchDataGenres();
     SplashScreen.hide();
+    const {nameUser, id} = this.state.user;
+    if (nameUser === null) {
+      this.props.navigation.navigate('editprofile', id);
+    }
   }
 
   fetchDataCaraousel = async () => {
@@ -141,6 +147,7 @@ class Dashboard extends Component {
       dataCaraousel,
       isLoading,
     } = this.state;
+    console.log(this.props.users);
     return (
       <SafeAreaView style={dashboardStyle.container}>
         {this.state.isLoading && (
@@ -238,6 +245,7 @@ class Dashboard extends Component {
 const mapStateToProps = (state) => ({
   books: state.books,
   genres: state.genres,
+  auth: state.auth,
 });
 
 const mapDispatchToProps = {

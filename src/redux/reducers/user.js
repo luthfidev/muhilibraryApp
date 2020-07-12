@@ -89,6 +89,7 @@ export const users = (state = initialState, action) => {
         ...state,
         isLoading: true,
         isError: false,
+        isSuccess: false,
       };
     }
     case 'UPDATE_USERS_PROFILE_REJECTED': {
@@ -96,6 +97,7 @@ export const users = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
+        isSuccess: false,
         errorMsg: action.payload.response.data.message,
       };
     }
@@ -104,6 +106,7 @@ export const users = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: false,
+        isSuccess: true,
         dataUsers: action.payload.data.data,
         successMsg: action.payload.data.message,
       };

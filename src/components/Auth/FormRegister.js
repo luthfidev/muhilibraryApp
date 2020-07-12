@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, View, Text, TextInput, Alert} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import {Button} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import {useForm, Controller} from 'react-hook-form';
@@ -7,6 +8,7 @@ import {register} from '../../redux/actions/auth';
 
 const FormRegister = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const {control, handleSubmit, errors} = useForm();
   const auth = useSelector((state) => state.auth.msg);
 
@@ -14,6 +16,7 @@ const FormRegister = () => {
     dispatch(register(data.email, data.password))
       .then((response) => {
         Alert.alert(auth);
+        navigation.navigate('login');
       })
       .catch((error) => {
         Alert.alert(auth);

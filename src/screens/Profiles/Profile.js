@@ -71,6 +71,7 @@ class Profile extends Component {
   }
   navigateEditProfile = () => {
     const {id} = this.state.user;
+    console.log(id)
     this.props.navigation.navigate('editprofile', id);
   };
 

@@ -5,27 +5,59 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  Image,
+  Alert,
 } from 'react-native';
+import jwt_decode from 'jwt-decode';
 import {Header, Input, Card, Button} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
 import moment from 'moment';
-import {getusersid} from '../../redux/actions/user';
+import {getusersid, updateusersprofile} from '../../redux/actions/user';
 
 class EditProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: this.props.route.params,
+      user: jwt_decode(this.props.auth.token),
     };
   }
   componentDidMount() {
     this.fetchData();
   }
+
+  onNameChange = (name) => {
+    this.setState({name});
+  };
+
+  onBirthdateChange = (birthdate) => {
+    this.setState({birthdate});
+  };
+
+  onGenderChange = (gender) => {
+    this.setState({gender});
+  };
+
+  handleSubmit = async () => {
+    const data = {
+      name: this.state.name,
+      birthdate: this.state.birthdate,
+      gender: this.state.gender,
+    };
+    const {token} = this.props.auth;
+    await this.props
+      .updateusersprofile(token, data)
+      .then((response) => {
+        Alert.alert(this.props.users.successMsg);
+        this.props.navigation.navigate('profile');
+      })
+      .catch((error) => {
+        Alert.alert(this.props.users.errorMsg);
+      });
+  };
+
   fetchData = async () => {
     const {token} = this.props.auth;
-    const id = this.state.id;
+    const {id} = this.state.user;
     await this.props.getusersid(token, id);
     const {dataUsers, isLoading} = this.props.users;
     this.setState({dataUsers, isLoading});
@@ -38,6 +70,7 @@ class EditProfile extends Component {
     );
   };
   render() {
+    console.log(this.state.name)
     return (
       <SafeAreaView style={profileStyle.container}>
         <View style={profileStyle.header}>
@@ -57,11 +90,13 @@ class EditProfile extends Component {
             <View style={profileStyle.WrapperForm}>
               <Input
                 label="Full Name"
+                onChangeText={this.onNameChange}
                 defaultValue={this.state.name}
                 /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
               />
               <Input
                 label="Birthdate"
+                onChangeText={this.onBirthdateChange}
                 defaultValue={this.state.birthdate}
                 /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
               />
@@ -84,12 +119,13 @@ class EditProfile extends Component {
                   uncheckedIcon="circle-o"
                 /> */}
                 <Input
+                  onChangeText={this.onGenderChange}
                   label="Gender"
                   defaultValue={this.state.gender}
                   /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
                 />
               </View>
-              <Button title="Save" />
+              <Button onPress={this.handleSubmit} title="Save" />
             </View>
           </Card>
         </View>
@@ -105,6 +141,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   getusersid,
+  updateusersprofile,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(EditProfile);
 const profileStyle = StyleSheet.create({
