@@ -20,10 +20,8 @@ class List extends Component {
     this.state = {
       isLoading: true,
       dataAuthors: [],
-      pageInfo: [],
       refreshing: false,
       page: 1,
-      loadingMore: false,
       search: '',
     };
   }
@@ -40,12 +38,10 @@ class List extends Component {
   }
 
   fetchData = async () => {
-    console.log(this.state.page);
     await this.props.getauthors(`limit=5&page=${this.state.page}`);
-    const {dataAuthors, pageInfo, isLoading} = await this.props.authors;
+    const {dataAuthors, isLoading} = await this.props.authors;
     this.setState({
       dataAuthors: this.state.dataAuthors.concat(dataAuthors),
-      pageInfo,
       isLoading,
     });
   };
@@ -65,23 +61,6 @@ class List extends Component {
         Alert.alert(this.props.authors.errorMsg);
       });
   };
-
-  rightSwipeOutButtons({item}) {
-    return [
-      {
-        onPress: () => this.deleteAuthor(item.id),
-        text: 'Remove',
-        backgroundColor: '#FF4500',
-        color: '#FFF',
-      },
-      {
-        onPress: () => this.props.navigation.navigate('editauthor', item),
-        text: 'Edit',
-        backgroundColor: '#ffb142',
-        color: '#FFF',
-      },
-    ];
-  }
 
   onRefresh = async () => {
     this.setState({page: 1});
@@ -114,6 +93,23 @@ class List extends Component {
     });
   };
 
+  rightSwipeOutButtons({item}) {
+    return [
+      {
+        onPress: () => this.deleteAuthor(item.id),
+        text: 'Remove',
+        backgroundColor: '#FF4500',
+        color: '#FFF',
+      },
+      {
+        onPress: () => this.props.navigation.navigate('editauthor', item),
+        text: 'Edit',
+        backgroundColor: '#ffb142',
+        color: '#FFF',
+      },
+    ];
+  }
+
   renderItem = ({item, index}) => (
     <Swipeout
       right={this.rightSwipeOutButtons({
@@ -126,7 +122,7 @@ class List extends Component {
   );
 
   render() {
-    const {search, page, dataAuthors, isLoading} = this.state;
+    const {dataAuthors, isLoading} = this.state;
     return (
       <View style={listStyle.container}>
         <Header

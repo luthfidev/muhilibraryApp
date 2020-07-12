@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
 import {Text, View, SafeAreaView, FlatList, StyleSheet} from 'react-native';
 import {Header, Card, Divider, Avatar} from 'react-native-elements';
+import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import moment from 'moment';
 import {connect} from 'react-redux';
-import {gettransactions} from '../../redux/actions/transaction';
+import {
+  gettransactions,
+  updatetransactions,
+} from '../../redux/actions/transaction';
 import {userhistory} from '../../redux/actions/user';
 class AllTransactions extends Component {
   constructor() {
@@ -30,10 +34,19 @@ class AllTransactions extends Component {
     }
   }
 
+  prosesTransaction = async (id) => {
+    this.setState({refreshing: true});
+    const data = {
+      statusid: 3,
+    };
+    await this.props.updatetransactions(id, data);
+    this.fetchData();
+    this.setState({refreshing: false});
+  };
+
   fetchData = async () => {
-    const {token} = this.props.auth;
     await this.props
-      .userhistory(token, 'limit=20page='.concat(this.state.currentPage))
+      .gettransactions('limit=20page='.concat(this.state.currentPage))
       .then((response) => {
         const {dataHistoryUsers, isLoading} = this.props.users;
         this.setState({dataTransactions: dataHistoryUsers, isLoading});
@@ -49,48 +62,56 @@ class AllTransactions extends Component {
     });
   };
 
-  /*   _onRefresh = () => {
-    this.setState({refreshing: true});
-    this.fetchData(this.state.currentPage).then(() => {
-      this.setState({refreshing: false});
-    });
-  }; */
-
-  nextPage = () => {
-    this.setState({currentPage: this.state.currentPage + 1}, () => {
-      this.fetchData({page: this.state.currentPage});
-    });
-  };
+  rightSwipeOutButtons(id) {
+    return [
+      /*     {
+        text: 'Remove',
+        backgroundColor: '#FF4500',
+        color: '#FFF',
+      }, */
+      {
+        onPress: () => this.prosesTransaction(id),
+        text: 'Return Book',
+        backgroundColor: '#7FFF00',
+        color: '#000',
+      },
+    ];
+  }
 
   renderItem = ({item}) => (
     <>
-      <View style={TransactionStyle.item}>
-        <View style={TransactionStyle.pictureWrapper}>
-          <Avatar
-            rounded
-            size="large"
-            source={{
-              uri:
-                'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-            }}
-          />
-        </View>
-        <View style={TransactionStyle.textWrapper}>
-          <Text style={TransactionStyle.textName}>{item.name}</Text>
-          <Text style={TransactionStyle.textName}>
-            {moment(item.transaction_date).format('yyyy-MM-DD')}
-          </Text>
-          <View style={TransactionStyle.status}>
-            <Text style={{color: 'white'}}>{item.statusName}</Text>
+      <Swipeout
+        right={this.rightSwipeOutButtons(item.id)}
+        backgroundColor={'transparent'}
+        close>
+        <View style={TransactionStyle.item}>
+          <View style={TransactionStyle.pictureWrapper}>
+            <Avatar
+              rounded
+              size="large"
+              source={{
+                uri:
+                  'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+              }}
+            />
+          </View>
+          <View style={TransactionStyle.textWrapper}>
+            <Text style={TransactionStyle.textName}>{item.name}</Text>
+            <Text style={TransactionStyle.textName}>
+              {moment(item.transaction_date).format('yyyy-MM-DD')}
+            </Text>
+            <View style={TransactionStyle.status}>
+              <Text style={{color: 'white'}}>{item.statusName}</Text>
+            </View>
           </View>
         </View>
-      </View>
-      <Divider style={{backgroundColor: 'grey'}} />
+        <Divider style={{backgroundColor: 'grey'}} />
+      </Swipeout>
     </>
   );
 
   render() {
-    const {search, currentPage, dataTransactions, isLoading} = this.state;
+    const {currentPage, dataTransactions, isLoading} = this.state;
     return (
       <SafeAreaView style={TransactionStyle.container}>
         <Header
@@ -138,6 +159,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   gettransactions,
   userhistory,
+  updatetransactions,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AllTransactions);

@@ -19,7 +19,7 @@ class List extends Component {
       isLoading: true,
       dataGenres: [],
       refreshing: false,
-      currentPage: 1,
+      page: 1,
       search: '',
     };
   }
@@ -28,18 +28,21 @@ class List extends Component {
     this.fetchData();
   }
 
-  fetchData = async () => {
-    await this.props.getgenres('limit=20page='.concat(this.state.currentPage));
-    const {dataGenres, isLoading} = this.props.genres;
-    this.setState({dataGenres, isLoading});
-  };
+  componentDidUpdate(prevProps) {
+    // don't forget to compare the props
+    if (this.props.genres.isSuccess !== prevProps.genres.isSuccess) {
+      this.onRefresh();
+    }
+  }
 
-  /*   _onRefresh = () => {
-    this.setState({refreshing: true});
-    this.fetchData(this.state.currentPage).then(() => {
-      this.setState({refreshing: false});
+  fetchData = async () => {
+    await this.props.getgenres(`limit=5&page=${this.state.page}`);
+    const {dataGenres, isLoading} = await this.props.genres;
+    this.setState({
+      dataGenres: this.state.dataGenres.concat(dataGenres),
+      isLoading,
     });
-  }; */
+  };
 
   updateSearch = (search) => {
     this.setState({search});
@@ -51,12 +54,41 @@ class List extends Component {
       .deletegenres(token, id)
       .then((response) => {
         Alert.alert(this.props.genres.successMsg);
-        this.fetchData();
       })
       .catch((error) => {
         Alert.alert(this.props.genres.errorMsg);
       });
-    this.fetchData();
+  };
+
+  onRefresh = async () => {
+    this.setState({page: 1});
+    await this.props.getgenres(`limit=5&page=${this.state.page}`);
+    const {dataGenres, isLoading} = this.props.genres;
+    this.setState({
+      dataGenres: dataGenres,
+      isLoading,
+    });
+  };
+
+  // Handle searchbar
+  handleSearch = async (e) => {
+    const {search} = this.state;
+    await this.props.getgenres('search='.concat(search.toLowerCase()));
+    const {dataGenres, isLoading} = this.props.genres;
+    this.setState({dataGenres, isLoading});
+  };
+
+  handleSearchClear = async (e) => {
+    this.setState({page: 1});
+    await this.props.getgenres(`page=${this.state.page}&search=`.concat(''));
+    const {dataGenres, isLoading} = this.props.genres;
+    this.setState({dataGenres, isLoading});
+  };
+
+  loadMore = () => {
+    this.setState({page: this.state.page + 1}, () => {
+      this.fetchData({page: this.state.page});
+    });
   };
 
   rightSwipeOutButtons(id) {
@@ -75,12 +107,6 @@ class List extends Component {
     ];
   }
 
-  nextPage = () => {
-    this.setState({currentPage: this.state.currentPage + 1}, () => {
-      this.fetchData({page: this.state.currentPage});
-    });
-  };
-
   renderItem = ({item}) => (
     <Swipeout
       right={this.rightSwipeOutButtons(item.id)}
@@ -91,10 +117,17 @@ class List extends Component {
   );
 
   render() {
-    const {search, currentPage, dataGenres, isLoading} = this.state;
+    const {dataGenres, isLoading} = this.state;
     return (
       <View style={listStyle.container}>
         <Header
+          leftComponent={
+            <View style={{padding: 5}}>
+              <Text style={{fontSize: 15, fontWeight: 'bold', color: 'white'}}>
+                Genres
+              </Text>
+            </View>
+          }
           centerComponent={
             <TouchableOpacity>
               <View style={listStyle.btnDown} />
@@ -102,26 +135,32 @@ class List extends Component {
           }
           rightComponent={
             <View style={{padding: 5}}>
-              <Text style={{fontSize: 15, fontWeight: 'bold', color: 'white'}}>
-                Genres
+              <Text
+                onPress={() => this.props.navigation.navigate('addgenre')}
+                style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>
+                ADD
               </Text>
             </View>
           }
         />
         <SearchBar
-          platform="android"
+          platform="ios"
           placeholder="Type Here..."
-          onChangeText={this.updateSearch}
-          value={search}
+          value={this.state.search}
+          onChangeText={(search) => this.setState({search})}
+          returnKeyType={'search'}
+          onSubmitEditing={this.handleSearch}
+          onCancel={this.handleSearchClear}
+          onClear={this.handleSearchClear}
         />
         <View>
           <FlatList
+            keyExtractor={(item, index) => index.toString()}
             data={dataGenres}
-            keyExtractor={(item) => item.id}
-            onRefresh={() => this.fetchData({page: currentPage})}
+            onRefresh={this.loadMore}
             refreshing={isLoading}
             renderItem={this.renderItem}
-            onEndReached={this.nextPage}
+            onEndReached={this.loadMore}
             onEndReachedThreshold={0.5}
           />
         </View>

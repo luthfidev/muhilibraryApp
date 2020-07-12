@@ -17,6 +17,7 @@ import AllTransactionsScreen from '../../screens/transactions/AllTransactions';
 import EditProfileScreen from '../../screens/Profiles/EditProfile';
 
 import GenresScreen from '../../screens/Genres/List';
+import AddGenresScreen from '../../screens/Genres/addGenre';
 
 import AuthorsScreen from '../../screens/Authors/List';
 import AddAuthorsScreen from '../../screens/Authors/addAuthor';
@@ -148,6 +149,18 @@ class Stack extends Component {
                   }}
                   component={GenresScreen}
                   name={'genre'}
+                />
+                <Stacks.Screen
+                  options={{
+                    title: 'Add Genre',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'vertical',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forModalPresentationIOS,
+                  }}
+                  component={AddGenresScreen}
+                  name={'addgenre'}
                 />
               </>
             )}

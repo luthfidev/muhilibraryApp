@@ -50,35 +50,6 @@ const CardView = () => {
             </TouchableOpacity>
           </ThemeProvider>
         </View>
-        <View style={CardStyle.wrapperButton}>
-          <ThemeProvider theme={theme}>
-            <TouchableOpacity>
-              <Card>
-                <Icon name="create" color="#44bd32" />
-                <Text style={CardStyle.btnTitle}>Author</Text>
-              </Card>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Card>
-                <Text>Button</Text>
-              </Card>
-            </TouchableOpacity>
-          </ThemeProvider>
-        </View>
-        <View style={CardStyle.wrapperButton}>
-          <ThemeProvider theme={theme}>
-            <TouchableOpacity>
-              <Card>
-                <Text>Button</Text>
-              </Card>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Card>
-                <Text>Button</Text>
-              </Card>
-            </TouchableOpacity>
-          </ThemeProvider>
-        </View>
       </View>
     </Card>
   );
@@ -145,9 +116,12 @@ class Profile extends Component {
     });
   };
 
-  createFormData = (avatar) => {
+  handleUploadAvatar = async () => {
+    const {id} = this.state.user;
+    const {token} = this.props.auth;
+    // const data = this.createFormData(this.state.avatar);
+    const avatar = this.state.avatar;
     const data = new FormData();
-
     data.append('picture', {
       name: avatar.fileName,
       type: avatar.type,
@@ -156,24 +130,13 @@ class Profile extends Component {
           ? avatar.uri
           : avatar.uri.replace('file://', ''),
     });
-
-    return data;
-  };
-
-  handleUploadAvatar = () => {
-    const {id} = this.state.user;
-    const {token} = this.props.auth;
-    const data = this.createFormData(this.state.avatar);
-    this.props
-      .uploadavatarprofile(token, id, qs.stringify(data))
-      .then((response) => response.json())
+    await this.props
+      .uploadavatarprofile(token, id, data)
       .then((response) => {
-        console.log('upload succes', response);
         Alert.alert('Upload success!');
         this.setState({avatar: null});
       })
       .catch((error) => {
-        console.log('upload error', error);
         Alert.alert('Upload failed!');
       });
   };
