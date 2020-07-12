@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import qs from 'querystring';
 import {
   Platform,
   StyleSheet,
@@ -21,10 +22,12 @@ import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';
+import ImagePicker from 'react-native-image-picker';
 import {REACT_APP_URL} from 'react-native-dotenv';
 const url = `${REACT_APP_URL}`;
 import {logout} from '../../redux/actions/auth';
-import {getusersid} from '../../redux/actions/user';
+import {getusersid, uploadavatarprofile} from '../../redux/actions/user';
+import {Alert} from 'react-native';
 
 const CardView = () => {
   const navigation = useNavigation();
@@ -91,6 +94,8 @@ class Profile extends Component {
         email: '',
         role: '',
       },
+      avatar: null,
+      progress: 0,
     };
   }
   navigateEditProfile = () => {
@@ -124,7 +129,57 @@ class Profile extends Component {
     );
   };
 
+  handleChoosePhoto = () => {
+    const options = {
+      quality: 1.0,
+      maxWidth: 500,
+      maxHeight: 500,
+      storageOptions: {
+        skipBackup: true,
+      },
+    };
+    ImagePicker.launchImageLibrary(options, (response) => {
+      if (response.uri) {
+        this.setState({avatar: response});
+      }
+    });
+  };
+
+  createFormData = (avatar) => {
+    const data = new FormData();
+
+    data.append('picture', {
+      name: avatar.fileName,
+      type: avatar.type,
+      uri:
+        Platform.OS === 'android'
+          ? avatar.uri
+          : avatar.uri.replace('file://', ''),
+    });
+
+    return data;
+  };
+
+  handleUploadAvatar = () => {
+    const {id} = this.state.user;
+    const {token} = this.props.auth;
+    const data = this.createFormData(this.state.avatar);
+    this.props
+      .uploadavatarprofile(token, id, qs.stringify(data))
+      .then((response) => response.json())
+      .then((response) => {
+        console.log('upload succes', response);
+        Alert.alert('Upload success!');
+        this.setState({avatar: null});
+      })
+      .catch((error) => {
+        console.log('upload error', error);
+        Alert.alert('Upload failed!');
+      });
+  };
+
   render() {
+    const {avatar} = this.state;
     return (
       <SafeAreaView style={profileStyle.container}>
         <View style={profileStyle.header}>
@@ -138,13 +193,32 @@ class Profile extends Component {
             }
           />
           <View style={profileStyle.WrapperAvatar}>
-            <Avatar
-              rounded
-              size={125}
-              source={{
-                uri: url + this.state.picture,
-              }}
-            />
+            {avatar && (
+              <>
+                <Avatar
+                  onPress={this.handleChoosePhoto}
+                  rounded
+                  size={125}
+                  source={{
+                    uri: avatar.uri,
+                  }}
+                />
+                <TouchableOpacity onPress={this.handleUploadAvatar}>
+                  <Text>Upload</Text>
+                </TouchableOpacity>
+              </>
+            )}
+            {!avatar && (
+              <Avatar
+                onPress={this.handleChoosePhoto}
+                rounded
+                size={125}
+                source={{
+                  uri: url + this.state.picture,
+                }}
+              />
+            )}
+
             <View style={profileStyle.wrapperBiodata}>
               <Text style={profileStyle.BiodataText}>{this.state.name}</Text>
               <Text style={profileStyle.BiodataText}>
@@ -179,6 +253,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   logout,
   getusersid,
+  uploadavatarprofile,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

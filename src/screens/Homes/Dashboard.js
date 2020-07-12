@@ -13,10 +13,8 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
-import qs from 'querystring';
-import _ from 'lodash';
 import {withNavigation} from '@react-navigation/compat';
-import {SearchBar, Divider, Badge, withTheme} from 'react-native-elements';
+import {SearchBar, Divider, Header} from 'react-native-elements';
 import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {getbooks} from '../../redux/actions/book';
@@ -44,14 +42,6 @@ class Dashboard extends Component {
     };
   }
 
-  /*   UNSAFE_componentWillMount() {
-    setTimeout(() => {
-      this.setState({
-        isLoading: false,
-      });
-    }, 3000);
-  } */
-
   async componentDidMount() {
     await this.fetchDataCaraousel();
     await this.fetchData();
@@ -60,14 +50,12 @@ class Dashboard extends Component {
   }
 
   fetchDataCaraousel = async () => {
-    const {currentPage} = this.state;
     await this.props.getbooks('limit=10');
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataCaraousel: dataBooks, isLoading});
   };
 
   fetchData = async () => {
-    const {currentPage} = this.state;
     await this.props.getbooks('limit=20');
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataBooks, isLoading});
@@ -163,6 +151,12 @@ class Dashboard extends Component {
         )}
         {!this.state.isLoading && (
           <>
+            <Header
+              centerComponent={{
+                text: 'List Books',
+                style: {color: '#fff'},
+              }}
+            />
             <View style={dashboardStyle.header}>
               <SearchBar
                 platform="ios"

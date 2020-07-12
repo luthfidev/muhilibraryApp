@@ -8,7 +8,7 @@ const initialState = {
   token: null,
 };
 
-export const books = (state = initialState, action) => {
+export const users = (state = initialState, action) => {
   switch (action.type) {
     case 'USERS_PENDING': {
       return {
@@ -98,7 +98,32 @@ export const books = (state = initialState, action) => {
         errorMsg: action.payload.response.data.message,
       };
     }
-    case 'UPDATE_USERS_PROFILE_FULFILLED': {
+    case 'UPLOAD_AVATAR_PROFILE_FULFILLED': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        dataUsers: action.payload.data.data,
+        successMsg: action.payload.data.message,
+      };
+    }
+    // UPDATE USERS PROFI;E
+    case 'UPLOAD_AVATAR_PROFILE_PENDING': {
+      return {
+        ...state,
+        isLoading: true,
+        isError: false,
+      };
+    }
+    case 'UPLOAD_AVATAR_PROFILE_REJECTED': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        errorMsg: action.payload.response.data,
+      };
+    }
+    case 'UPLOAD_AVATAR_PROFILE_FULFILLED': {
       return {
         ...state,
         isLoading: false,
@@ -115,4 +140,4 @@ export const books = (state = initialState, action) => {
   }
 };
 
-export default books;
+export default users;

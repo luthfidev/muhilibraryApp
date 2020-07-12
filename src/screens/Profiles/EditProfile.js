@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
 import {
   StyleSheet,
-  Platform,
   Text,
   View,
   SafeAreaView,
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {Header, Input, Card, CheckBox, Button} from 'react-native-elements';
+import {Header, Input, Card, Button} from 'react-native-elements';
 import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
 import moment from 'moment';
