@@ -78,6 +78,13 @@ class Profile extends Component {
     this.fetchData();
   }
 
+  componentDidUpdate(prevProps) {
+    // don't forget to compare the props
+    if (this.props.users.isSuccess !== prevProps.users.isSuccess) {
+      this.fetchData();
+    }
+  }
+
   onLogout = async () => {
     const {token} = this.props.auth;
     await this.props.logout(token);
@@ -109,9 +116,24 @@ class Profile extends Component {
         skipBackup: true,
       },
     };
-    ImagePicker.launchImageLibrary(options, (response) => {
+    /* ImagePicker.launchImageLibrary(options, (response) => {
       if (response.uri) {
         this.setState({avatar: response});
+      }
+    }); */
+    ImagePicker.showImagePicker(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        const source = response;
+
+        this.setState({
+          avatar: source,
+        });
       }
     });
   };
@@ -159,6 +181,7 @@ class Profile extends Component {
             {avatar && (
               <>
                 <Avatar
+                  showEditButton
                   onPress={this.handleChoosePhoto}
                   rounded
                   size={125}
@@ -167,12 +190,13 @@ class Profile extends Component {
                   }}
                 />
                 <TouchableOpacity onPress={this.handleUploadAvatar}>
-                  <Text>Upload</Text>
+                  <Text style={profileStyle.btnupload}>SAVE</Text>
                 </TouchableOpacity>
               </>
             )}
             {!avatar && (
               <Avatar
+                showEditButton
                 onPress={this.handleChoosePhoto}
                 rounded
                 size={125}
@@ -298,6 +322,11 @@ const profileStyle = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
     marginBottom: 10,
+  },
+  btnupload: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 

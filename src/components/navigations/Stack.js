@@ -18,6 +18,7 @@ import EditProfileScreen from '../../screens/Profiles/EditProfile';
 
 import GenresScreen from '../../screens/Genres/List';
 import AddGenresScreen from '../../screens/Genres/addGenre';
+import EditGenresScreen from '../../screens/Genres/editGenre';
 
 import AuthorsScreen from '../../screens/Authors/List';
 import AddAuthorsScreen from '../../screens/Authors/addAuthor';
@@ -29,6 +30,7 @@ import BookGenresScreen from '../../screens/Books/BookGenres';
 
 // Bottom Tab
 import Tab from './Tab';
+import editGenre from '../../screens/Genres/editGenre';
 const Stacks = createStackNavigator();
 class Stack extends Component {
   render() {
@@ -161,6 +163,18 @@ class Stack extends Component {
                   }}
                   component={AddGenresScreen}
                   name={'addgenre'}
+                />
+                <Stacks.Screen
+                  options={{
+                    title: 'Edit Genre',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'vertical',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forModalPresentationIOS,
+                  }}
+                  component={EditGenresScreen}
+                  name={'editgenre'}
                 />
               </>
             )}

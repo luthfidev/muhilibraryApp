@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Text, View, SafeAreaView, FlatList, StyleSheet} from 'react-native';
-import {Header, Card, Divider, Avatar} from 'react-native-elements';
+import {Header, Card, Divider, Avatar, SearchBar} from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import moment from 'moment';
@@ -17,7 +17,7 @@ class AllTransactions extends Component {
       isLoading: true,
       dataTransactions: [],
       refreshing: false,
-      currentPage: 1,
+      page: 1,
       search: '',
     };
   }
@@ -37,7 +37,7 @@ class AllTransactions extends Component {
   prosesTransaction = async (id) => {
     this.setState({refreshing: true});
     const data = {
-      statusid: 3,
+      statusid: 1,
     };
     await this.props.updatetransactions(id, data);
     this.fetchData();
@@ -46,19 +46,28 @@ class AllTransactions extends Component {
 
   fetchData = async () => {
     await this.props
-      .gettransactions('limit=20page='.concat(this.state.currentPage))
+      .gettransactions(`limit=5&page=${this.state.page}`)
       .then((response) => {
-        const {dataHistoryUsers, isLoading} = this.props.users;
-        this.setState({dataTransactions: dataHistoryUsers, isLoading});
+        const {dataTransactions, isLoading} = this.props.transactions;
+        this.setState({
+          dataTransactions: this.state.dataTransactions.concat(
+            dataTransactions,
+          ),
+          isLoading,
+        });
       })
       .catch((error) => {
         this.setState({dataTransactions: [], isLoading: false});
       });
   };
 
-  nextPage = () => {
-    this.setState({currentPage: this.state.currentPage + 1}, () => {
-      this.fetchData({page: this.state.currentPage});
+  onRefresh = async () => {
+    this.setState({page: 1});
+    await this.props.gettransactions(`limit=5&page=${this.state.page}`);
+    const {dataTransactions, isLoading} = this.props.transactions;
+    this.setState({
+      dataTransactions,
+      isLoading,
     });
   };
 
@@ -78,36 +87,65 @@ class AllTransactions extends Component {
     ];
   }
 
+  updateSearch = (search) => {
+    this.setState({search});
+  };
+
+  // Handle searchbar
+  handleSearch = async (e) => {
+    const {search} = this.state;
+    await this.props.gettransactions(
+      'limit=20&search='.concat(search.toLowerCase()),
+    );
+    const {dataTransactions, isLoading} = this.props.transactions;
+    this.setState({dataTransactions, isLoading});
+  };
+
+  handleSearchClear = async (e) => {
+    await this.props.gettransactions('search='.concat(''));
+    const {dataTransactions, isLoading} = this.props.transactions;
+    this.setState({dataTransactions, isLoading});
+  };
+
+  loadMore = () => {
+    this.setState({page: this.state.page + 1}, () => {
+      this.fetchData({page: this.state.page});
+    });
+  };
+
   renderItem = ({item}) => (
-    <>
-      <Swipeout
-        right={this.rightSwipeOutButtons(item.id)}
-        backgroundColor={'transparent'}
-        close>
-        <View style={TransactionStyle.item}>
-          <View style={TransactionStyle.pictureWrapper}>
-            <Avatar
-              rounded
-              size="large"
-              source={{
-                uri:
-                  'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-              }}
-            />
-          </View>
-          <View style={TransactionStyle.textWrapper}>
+    <Swipeout
+      right={this.rightSwipeOutButtons(item.id)}
+      backgroundColor={'transparent'}
+      close>
+      <View style={TransactionStyle.item}>
+        <View style={TransactionStyle.pictureWrapper}>
+          <Avatar
+            rounded
+            size="large"
+            source={{
+              uri:
+                'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+            }}
+          />
+        </View>
+        <View style={TransactionStyle.Wrapper}>
+          <View style={TransactionStyle.WrapperText}>
             <Text style={TransactionStyle.textName}>{item.name}</Text>
-            <Text style={TransactionStyle.textName}>
-              {moment(item.transaction_date).format('yyyy-MM-DD')}
-            </Text>
             <View style={TransactionStyle.status}>
               <Text style={{color: 'white'}}>{item.statusName}</Text>
             </View>
           </View>
+          <View style={TransactionStyle.titlebook}>
+            <Text>Tittle Book: {item.title}</Text>
+          </View>
+          <View style={TransactionStyle.date}>
+            <Text>{moment(item.transaction_date).format('yyyy-MM-DD')}</Text>
+          </View>
         </View>
-        <Divider style={{backgroundColor: 'grey'}} />
-      </Swipeout>
-    </>
+      </View>
+      <Divider style={{backgroundColor: 'grey'}} />
+    </Swipeout>
   );
 
   render() {
@@ -127,15 +165,25 @@ class AllTransactions extends Component {
             style: {color: '#fff'},
           }}
         />
+        <SearchBar
+          platform="ios"
+          placeholder="Type Here..."
+          value={this.state.search}
+          onChangeText={(search) => this.setState({search})}
+          returnKeyType={'search'}
+          onSubmitEditing={this.handleSearch}
+          onCancel={this.handleSearchClear}
+          onClear={this.handleSearchClear}
+        />
         <View>
           {dataTransactions.length !== 0 && (
             <FlatList
               data={dataTransactions}
               keyExtractor={(item) => item.id}
-              onRefresh={() => this.fetchData({page: currentPage})}
+              onRefresh={this.loadMore}
               refreshing={isLoading}
               renderItem={this.renderItem}
-              onEndReached={this.nextPage}
+              onEndReached={this.loadMore}
               onEndReachedThreshold={0.5}
             />
           )}
@@ -165,6 +213,10 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(AllTransactions);
 
 const TransactionStyle = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
   },
@@ -183,12 +235,27 @@ const TransactionStyle = StyleSheet.create({
     alignItems: 'center',
     marginRight: 20,
   },
-  textWrapper: {
+  Wrapper: {
     justifyContent: 'center',
+    width: 250,
+  },
+  WrapperText: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+  },
+  date: {
+    marginTop: 10,
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+  },
+  titlebook: {
+    marginTop: 10,
+    alignItems: 'center',
+    flexDirection: 'column',
   },
   textName: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 17,
   },
   status: {
     alignItems: 'center',

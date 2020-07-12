@@ -14,7 +14,7 @@ import {
   ImageBackground,
 } from 'react-native';
 import {withNavigation} from '@react-navigation/compat';
-import {SearchBar, Divider, Header} from 'react-native-elements';
+import {SearchBar, Divider, Header, Card} from 'react-native-elements';
 import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {getbooks} from '../../redux/actions/book';
@@ -141,7 +141,6 @@ class Dashboard extends Component {
       dataCaraousel,
       isLoading,
     } = this.state;
-    console.log(dataGenres);
     return (
       <SafeAreaView style={dashboardStyle.container}>
         {this.state.isLoading && (
@@ -198,29 +197,36 @@ class Dashboard extends Component {
                   renderItem={this._renderItem}
                 />
               </View>
-              <View style={dashboardStyle.booklist}>
-                <Text style={dashboardStyle.titlelist}>Romance</Text>
-                <FlatList
-                  horizontal
-                  style={dashboardStyle.booklist}
-                  data={dataBooks}
-                  renderItem={this._renderItemFlat}
-                  keyExtractor={(item) => item.email}
-                  onRefresh={() => this.fetchData({page: currentPage})}
-                  refreshing={isLoading}
-                />
-                <Divider style={{backgroundColor: 'grey'}} />
-                <FlatList
-                  horizontal
-                  style={dashboardStyle.booklist}
-                  data={dataBooks}
-                  renderItem={this._renderItemFlat}
-                  keyExtractor={(item) => item.email}
-                  onRefresh={() => this.fetchData({page: currentPage})}
-                  refreshing={isLoading}
-                />
-                <Divider style={{backgroundColor: 'grey'}} />
-              </View>
+              {dataBooks.length !== 0 && (
+                <View style={dashboardStyle.booklist}>
+                  <Text style={dashboardStyle.titlelist}>Romance</Text>
+                  <FlatList
+                    horizontal
+                    style={dashboardStyle.booklist}
+                    data={dataBooks}
+                    renderItem={this._renderItemFlat}
+                    keyExtractor={(item) => item.email}
+                    onRefresh={() => this.fetchData({page: currentPage})}
+                    refreshing={isLoading}
+                  />
+                  <Divider style={{backgroundColor: 'grey'}} />
+                  <FlatList
+                    horizontal
+                    style={dashboardStyle.booklist}
+                    data={dataBooks}
+                    renderItem={this._renderItemFlat}
+                    keyExtractor={(item) => item.email}
+                    onRefresh={() => this.fetchData({page: currentPage})}
+                    refreshing={isLoading}
+                  />
+                  <Divider style={{backgroundColor: 'grey'}} />
+                </View>
+              )}
+              {dataBooks.length === 0 && (
+                <Card>
+                  <Text>No book founds</Text>
+                </Card>
+              )}
             </ScrollView>
           </>
         )}
@@ -259,8 +265,9 @@ const dashboardStyle = StyleSheet.create({
   titlelist: {
     marginLeft: 10,
     marginBottom: 5,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#2d98da',
   },
   item: {
     width: 100,
@@ -323,7 +330,7 @@ const genreStyle = StyleSheet.create({
   },
   badge: {
     padding: 5,
-    backgroundColor: 'green',
+    backgroundColor: '#1B9CFC',
     borderRadius: 6,
     alignItems: 'center',
   },

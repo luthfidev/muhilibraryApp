@@ -91,15 +91,16 @@ class List extends Component {
     });
   };
 
-  rightSwipeOutButtons(id) {
+  rightSwipeOutButtons({item}) {
     return [
       {
-        onPress: () => this.deleteGenre(id),
+        onPress: () => this.deleteGenre(item.id),
         text: 'Remove',
         backgroundColor: '#FF4500',
         color: '#FFF',
       },
       {
+        onPress: () => this.props.navigation.navigate('editgenre', item),
         text: 'Edit',
         backgroundColor: '#ffb142',
         color: '#FFF',
@@ -109,7 +110,7 @@ class List extends Component {
 
   renderItem = ({item}) => (
     <Swipeout
-      right={this.rightSwipeOutButtons(item.id)}
+      right={this.rightSwipeOutButtons({item})}
       backgroundColor={'transparent'}
       close>
       <ListItem title={`${item.name}`} bottomDivider={true} />

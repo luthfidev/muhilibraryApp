@@ -4,6 +4,7 @@ const initialState = {
   isLoading: false,
   successMsg: '',
   isError: false,
+  isSuccess: false,
   errorMsg: '',
   token: null,
 };
@@ -98,7 +99,7 @@ export const users = (state = initialState, action) => {
         errorMsg: action.payload.response.data.message,
       };
     }
-    case 'UPLOAD_AVATAR_PROFILE_FULFILLED': {
+    case 'UPDATE_USERS_PROFILE_FULFILLED': {
       return {
         ...state,
         isLoading: false,
@@ -113,6 +114,7 @@ export const users = (state = initialState, action) => {
         ...state,
         isLoading: true,
         isError: false,
+        isSuccess: false,
       };
     }
     case 'UPLOAD_AVATAR_PROFILE_REJECTED': {
@@ -120,6 +122,7 @@ export const users = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
+        isSuccess: false,
         errorMsg: action.payload.response.data,
       };
     }
@@ -128,6 +131,7 @@ export const users = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: false,
+        isSuccess: true,
         dataUsers: action.payload.data.data,
         successMsg: action.payload.data.message,
       };

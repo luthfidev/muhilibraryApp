@@ -42,12 +42,11 @@ class Proses extends Component {
   }
 
   fetchData = async () => {
-    const {token} = this.props.auth;
     await this.props
-      .userhistory(token, 'search=Pending')
+      .gettransactions('search=Pending')
       .then((response) => {
-        const {dataHistoryUsers, isLoading} = this.props.users;
-        this.setState({dataTransactions: dataHistoryUsers, isLoading});
+        const {dataTransactions, isLoading} = this.props.transactions;
+        this.setState({dataTransactions: dataTransactions, isLoading});
       })
       .catch((error) => {
         this.setState({dataTransactions: [], isLoading: false});
@@ -103,13 +102,18 @@ class Proses extends Component {
             }}
           />
         </View>
-        <View style={TransactionStyle.textWrapper}>
-          <Text style={TransactionStyle.textName}>{item.name}</Text>
-          <Text style={TransactionStyle.textName}>
-            {moment(item.transaction_date).format('yyyy-MM-DD')}
-          </Text>
-          <View style={TransactionStyle.status}>
-            <Text style={{color: 'white'}}>{item.statusName}</Text>
+        <View style={TransactionStyle.Wrapper}>
+          <View style={TransactionStyle.WrapperText}>
+            <Text style={TransactionStyle.textName}>{item.name}</Text>
+            <View style={TransactionStyle.status}>
+              <Text style={{color: 'white'}}>{item.statusName}</Text>
+            </View>
+          </View>
+          <View style={TransactionStyle.titlebook}>
+            <Text>Tittle Book: {item.title}</Text>
+          </View>
+          <View style={TransactionStyle.date}>
+            <Text>{moment(item.transaction_date).format('yyyy-MM-DD')}</Text>
           </View>
         </View>
       </View>
@@ -118,7 +122,7 @@ class Proses extends Component {
   );
 
   render() {
-    const {search, currentSearch, dataTransactions, isLoading} = this.state;
+    const {currentSearch, dataTransactions, isLoading} = this.state;
     return (
       <SafeAreaView style={TransactionStyle.container}>
         {this.state.isLoading && (
@@ -205,12 +209,27 @@ const TransactionStyle = StyleSheet.create({
     alignItems: 'center',
     marginRight: 20,
   },
-  textWrapper: {
+  Wrapper: {
     justifyContent: 'center',
+    width: 250,
+  },
+  WrapperText: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+  },
+  date: {
+    marginTop: 10,
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+  },
+  titlebook: {
+    marginTop: 10,
+    alignItems: 'center',
+    flexDirection: 'column',
   },
   textName: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 17,
   },
   status: {
     alignItems: 'center',
