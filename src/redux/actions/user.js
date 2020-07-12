@@ -2,6 +2,7 @@ import {REACT_APP_URL} from 'react-native-dotenv';
 import qs from 'querystring';
 import http from '../../helpers/http';
 const url = `${REACT_APP_URL}`;
+// const url = 'http://192.168.1.35:5000/';
 
 export const getusers = () => {
   return {
