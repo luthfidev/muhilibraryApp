@@ -11,6 +11,8 @@ import {Header, Divider, Avatar, Card} from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import moment from 'moment';
+import {REACT_APP_URL} from 'react-native-dotenv';
+const url = `${REACT_APP_URL}`;
 import {connect} from 'react-redux';
 import {
   gettransactions,
@@ -97,8 +99,7 @@ class Proses extends Component {
             rounded
             size="large"
             source={{
-              uri:
-                'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+              uri: url + item.picture,
             }}
           />
         </View>

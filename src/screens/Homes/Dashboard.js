@@ -35,6 +35,8 @@ class Dashboard extends Component {
       dataUsers: [],
       isLoading: true,
       dataBooks: [],
+      dataBooksHumor: [],
+      dataBooksHorror: [],
       dataGenres: [],
       dataCaraousel: [],
       refreshing: false,
@@ -47,6 +49,8 @@ class Dashboard extends Component {
   async componentDidMount() {
     await this.fetchDataCaraousel();
     await this.fetchData();
+    await this.fetchDataHumor();
+    await this.fetchDataHorror();
     await this.fetchDataGenres();
     SplashScreen.hide();
     const {nameUser, id} = this.state.user;
@@ -56,7 +60,7 @@ class Dashboard extends Component {
   }
 
   fetchDataCaraousel = async () => {
-    await this.props.getbooks('limit=10');
+    await this.props.getbooks('limit=5');
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataCaraousel: dataBooks, isLoading});
   };
@@ -65,6 +69,18 @@ class Dashboard extends Component {
     await this.props.getbooks('limit=20');
     const {dataBooks, isLoading} = this.props.books;
     this.setState({dataBooks, isLoading});
+  };
+
+  fetchDataHumor = async () => {
+    await this.props.getbooks('limit=20&search=Humor');
+    const {dataBooks, isLoading} = this.props.books;
+    this.setState({dataBooksHumor: dataBooks, isLoading});
+  };
+
+  fetchDataHorror = async () => {
+    await this.props.getbooks('limit=20&search=Horror');
+    const {dataBooks, isLoading} = this.props.books;
+    this.setState({dataBooksHorror: dataBooks, isLoading});
   };
 
   fetchDataGenres = async () => {
@@ -126,6 +142,36 @@ class Dashboard extends Component {
     );
   };
 
+  _renderItemFlatHumor = ({item, index}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => this.props.navigation.navigate('detailbook', item.id)}>
+        <View style={homeStyle.item}>
+          <View style={homeStyle.pictureWrapper}>
+            <ImageBackground style={homeStyle.picture} source={Logo}>
+              <Image style={homeStyle.picture} source={{uri: item.image}} />
+            </ImageBackground>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  _renderItemFlatHorror = ({item, index}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => this.props.navigation.navigate('detailbook', item.id)}>
+        <View style={homeStyle.item}>
+          <View style={homeStyle.pictureWrapper}>
+            <ImageBackground style={homeStyle.picture} source={Logo}>
+              <Image style={homeStyle.picture} source={{uri: item.image}} />
+            </ImageBackground>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   _renderItemGenres = ({item, index}) => {
     return (
       <TouchableOpacity
@@ -143,6 +189,8 @@ class Dashboard extends Component {
     const {
       currentPage,
       dataBooks,
+      dataBooksHumor,
+      dataBooksHorror,
       dataGenres,
       dataCaraousel,
       isLoading,
@@ -206,12 +254,23 @@ class Dashboard extends Component {
               </View>
               {dataBooks.length !== 0 && (
                 <View style={dashboardStyle.booklist}>
-                  <Text style={dashboardStyle.titlelist}>Romance</Text>
+                  <Text style={dashboardStyle.titlelist}>Humor</Text>
                   <FlatList
                     horizontal
                     style={dashboardStyle.booklist}
-                    data={dataBooks}
-                    renderItem={this._renderItemFlat}
+                    data={dataBooksHumor}
+                    renderItem={this._renderItemFlatHumor}
+                    keyExtractor={(item) => item.email}
+                    onRefresh={() => this.fetchData({page: currentPage})}
+                    refreshing={isLoading}
+                  />
+                  <Divider style={{backgroundColor: 'grey'}} />
+                  <Text style={dashboardStyle.titlelist}>Horror</Text>
+                  <FlatList
+                    horizontal
+                    style={dashboardStyle.booklist}
+                    data={dataBooksHorror}
+                    renderItem={this._renderItemFlatHorror}
                     keyExtractor={(item) => item.email}
                     onRefresh={() => this.fetchData({page: currentPage})}
                     refreshing={isLoading}

@@ -4,7 +4,10 @@ import {Header, Card, Divider, Avatar, SearchBar} from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import moment from 'moment';
+import DropDownPicker from 'react-native-dropdown-picker';
 import {connect} from 'react-redux';
+import {REACT_APP_URL} from 'react-native-dotenv';
+const url = `${REACT_APP_URL}`;
 import {
   gettransactions,
   updatetransactions,
@@ -18,6 +21,7 @@ class AllTransactions extends Component {
       dataTransactions: [],
       refreshing: false,
       page: 1,
+      sort: 0,
       search: '',
     };
   }
@@ -46,7 +50,9 @@ class AllTransactions extends Component {
 
   fetchData = async () => {
     await this.props
-      .gettransactions(`limit=5&page=${this.state.page}`)
+      .gettransactions(
+        `sort=${this.state.sort}&limit=5&page=${this.state.page}`,
+      )
       .then((response) => {
         const {dataTransactions, isLoading} = this.props.transactions;
         this.setState({
@@ -124,10 +130,10 @@ class AllTransactions extends Component {
             rounded
             size="large"
             source={{
-              uri:
-                'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+              uri: url + item.picture,
             }}
           />
+          {console.log(item)}
         </View>
         <View style={TransactionStyle.Wrapper}>
           <View style={TransactionStyle.WrapperText}>
@@ -149,7 +155,7 @@ class AllTransactions extends Component {
   );
 
   render() {
-    const {currentPage, dataTransactions, isLoading} = this.state;
+    const {dataTransactions, isLoading} = this.state;
     return (
       <SafeAreaView style={TransactionStyle.container}>
         <Header
@@ -176,6 +182,18 @@ class AllTransactions extends Component {
           onClear={this.handleSearchClear}
         />
         <View>
+          <View style={TransactionStyle.sort}>
+            <DropDownPicker
+              placeholder="Sort"
+              items={[
+                {label: 'A-z', value: 1},
+                {label: 'Z-a', value: 0},
+              ]}
+              defaultIndex={0}
+              containerStyle={{width: 100, height: 40}}
+              onChangeItem={() => this.fetchData({sort: 1})}
+            />
+          </View>
           {dataTransactions.length !== 0 && (
             <FlatList
               data={dataTransactions}
@@ -263,5 +281,10 @@ const TransactionStyle = StyleSheet.create({
     width: 70,
     height: 20,
     borderRadius: 5,
+  },
+  sort: {
+    marginRight: 15,
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
   },
 });

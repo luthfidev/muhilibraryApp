@@ -9,11 +9,12 @@ const FormLogin = () => {
   const dispatch = useDispatch();
   const {control, handleSubmit, errors} = useForm();
   const auth = useSelector((state) => state.auth.msg);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   const onSubmit = async (data) => {
     await dispatch(login(data.email, data.password))
       .then((response) => {
-        Alert.alert(auth);
+        Alert.alert('Login Success');
       })
       .catch((error) => {
         Alert.alert(auth);
@@ -80,7 +81,11 @@ const FormLogin = () => {
           <Text style={loginStyle.errormsg}>{errors.password.message}</Text>
         )}
       </View>
-      <Button title="Login" onPress={handleSubmit(onSubmit)} />
+      <Button
+        title="Login"
+        loading={isLoading}
+        onPress={handleSubmit(onSubmit)}
+      />
     </View>
   );
 };

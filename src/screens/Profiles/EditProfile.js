@@ -6,10 +6,10 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
 } from 'react-native';
 import jwt_decode from 'jwt-decode';
 import {Header, Input, Card, Button} from 'react-native-elements';
-import Icon from 'react-native-ionicons';
 import {connect} from 'react-redux';
 import moment from 'moment';
 import {getusersid, updateusersprofile} from '../../redux/actions/user';
@@ -70,65 +70,55 @@ class EditProfile extends Component {
     );
   };
   render() {
-    console.log(this.state.name)
+    const {isLoading} = this.props.users;
     return (
       <SafeAreaView style={profileStyle.container}>
-        <View style={profileStyle.header}>
-          <Header
-            centerComponent={
-              <TouchableOpacity>
-                <View style={profileStyle.btnDown} />
-              </TouchableOpacity>
-            }
-          />
-          <View style={{alignItems: 'center'}}>
-            <Text style={{fontSize: 25, fontWeight: 'bold', marginTop: 10}}>
-              Profile
-            </Text>
-          </View>
-          <Card>
-            <View style={profileStyle.WrapperForm}>
-              <Input
-                label="Full Name"
-                onChangeText={this.onNameChange}
-                defaultValue={this.state.name}
-                /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
-              />
-              <Input
-                label="Birthdate"
-                onChangeText={this.onBirthdateChange}
-                defaultValue={this.state.birthdate}
-                /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
-              />
-              <View
-                style={{
-                  justifyContent: 'center',
-                  flexDirection: 'row',
-                  marginBottom: 20,
-                }}>
-                {/* <CheckBox
-                  center
-                  title="Male"
-                  checkedIcon="dot-circle-o"
-                  uncheckedIcon="circle-o"
-                />
-                <CheckBox
-                  center
-                  title="Female"
-                  checkedIcon="dot-circle-o"
-                  uncheckedIcon="circle-o"
-                /> */}
+        <KeyboardAvoidingView behavior="position">
+          <View style={profileStyle.header}>
+            <Header
+              centerComponent={
+                <TouchableOpacity>
+                  <View style={profileStyle.btnDown} />
+                </TouchableOpacity>
+              }
+            />
+
+            <View style={{alignItems: 'center'}}>
+              <Text style={{fontSize: 25, fontWeight: 'bold', marginTop: 10}}>
+                Profile
+              </Text>
+            </View>
+            <Card>
+              <View style={profileStyle.WrapperForm}>
                 <Input
-                  onChangeText={this.onGenderChange}
-                  label="Gender"
-                  defaultValue={this.state.gender}
+                  label="Full Name"
+                  onChangeText={this.onNameChange}
+                  defaultValue={this.state.name}
                   /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
                 />
+                <Input
+                  label="Birthdate"
+                  onChangeText={this.onBirthdateChange}
+                  defaultValue={this.state.birthdate}
+                  /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
+                />
+                <View>
+                  <Input
+                    onChangeText={this.onGenderChange}
+                    label="Gender"
+                    defaultValue={this.state.gender}
+                    /* leftIcon={{type: 'font-awesome', name: 'chevron-left'}} */
+                  />
+                </View>
+                <Button
+                  loading={isLoading}
+                  onPress={this.handleSubmit}
+                  title="Save"
+                />
               </View>
-              <Button onPress={this.handleSubmit} title="Save" />
-            </View>
-          </Card>
-        </View>
+            </Card>
+          </View>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }

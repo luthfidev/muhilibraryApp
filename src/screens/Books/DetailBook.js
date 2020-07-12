@@ -70,7 +70,7 @@ class DetailBook extends Component {
     );
   };
   render() {
-    const {bookid, booktitle, bookimage, bookdesc, bookstatus} = this.state;
+    const {isLoading, booktitle, bookimage, bookdesc, bookstatus} = this.state;
     return (
       <ThemeProvider theme={theme}>
         <Header
@@ -100,7 +100,11 @@ class DetailBook extends Component {
             </View>
             <View style={detailBookStyle.btnBorrow}>
               {bookstatus === 'Available' && (
-                <Button onPress={this.handlePostBorrow} title="Borrow" />
+                <Button
+                  loading={isLoading}
+                  onPress={this.handlePostBorrow}
+                  title="Borrow"
+                />
               )}
             </View>
           </View>
