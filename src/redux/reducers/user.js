@@ -107,7 +107,7 @@ export const users = (state = initialState, action) => {
         isLoading: false,
         isError: false,
         isSuccess: true,
-        dataUsers: action.payload.data.data,
+        token: action.payload.data.token,
         successMsg: action.payload.data.message,
       };
     }

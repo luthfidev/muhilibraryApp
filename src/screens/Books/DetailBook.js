@@ -116,6 +116,7 @@ class DetailBook extends Component {
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
+  users: state.users,
   books: state.books,
   transactions: state.transactions,
 });

@@ -42,8 +42,9 @@ class Proses extends Component {
   }
 
   fetchData = async () => {
+    const {token} = this.props.auth;
     await this.props
-      .gettransactions('search=Pending')
+      .userhistory(token, 'search=Pending')
       .then((response) => {
         const {dataHistoryUsers, isLoading} = this.props.users;
         this.setState({dataHistoryUsers, isLoading});

@@ -16,7 +16,7 @@ const persistConfig = {
   storage: AsyncStorage,
   stateReconciler: hardSet,
   debug: false,
-  whitelist: ['auth', 'clear'],
+  whitelist: ['auth', 'clear', 'users'],
 };
 
 const rootReducer = combineReducers({
