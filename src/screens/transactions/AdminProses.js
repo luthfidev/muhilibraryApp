@@ -1,26 +1,32 @@
 import React, {Component} from 'react';
-import {Text, View, SafeAreaView, FlatList, StyleSheet} from 'react-native';
-import {Header, Card, Divider, Avatar, SearchBar} from 'react-native-elements';
+import {
+  Text,
+  ActivityIndicator,
+  View,
+  SafeAreaView,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
+import {Header, Divider, Avatar, Card} from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import moment from 'moment';
-import DropDownPicker from 'react-native-dropdown-picker';
-import {connect} from 'react-redux';
 import {REACT_APP_URL} from 'react-native-dotenv';
 const url = `${REACT_APP_URL}`;
+import {connect} from 'react-redux';
 import {
   gettransactions,
   updatetransactions,
 } from '../../redux/actions/transaction';
 import {userhistory} from '../../redux/actions/user';
-class AllTransactions extends Component {
+class AdminProses extends Component {
   constructor() {
     super();
     this.state = {
       isLoading: true,
-      dataHistoryUsers: [],
+      dataTransactions: [],
       refreshing: false,
-      page: 1,
+      currentSearch: 'Pending',
       search: '',
     };
   }
@@ -30,45 +36,40 @@ class AllTransactions extends Component {
 
   componentDidUpdate(prevProps) {
     // don't forget to compare the props
-    if (this.props.users.isSuccess !== prevProps.users.isSuccess) {
+    if (
+      this.props.transactions.isSuccess !== prevProps.transactions.isSuccess
+    ) {
       this.fetchData();
     }
   }
 
+  fetchData = async () => {
+    await this.props
+      .gettransactions('search=Pending')
+      .then((response) => {
+        const {dataTransactions, isLoading} = this.props.transactions;
+        this.setState({dataTransactions: dataTransactions, isLoading});
+      })
+      .catch((error) => {
+        this.setState({dataTransactions: [], isLoading: false});
+      });
+  };
+
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.fetchData(this.state.currentSearch).then(() => {
+      this.setState({refreshing: false});
+    });
+  };
+
   prosesTransaction = async (id) => {
     this.setState({refreshing: true});
     const data = {
-      statusid: 1,
+      statusid: 2,
     };
     await this.props.updatetransactions(id, data);
     this.fetchData();
     this.setState({refreshing: false});
-  };
-
-  fetchData = async () => {
-    const {token} = this.props.auth;
-    await this.props
-      .userhistory(token, `limit=5&page=${this.state.page}`)
-      .then((response) => {
-        const {dataHistoryUsers, isLoading} = this.props.users;
-        this.setState({
-          dataHistoryUsers,
-          isLoading,
-        });
-      })
-      .catch((error) => {
-        this.setState({dataHistoryUsers: [], isLoading: false});
-      });
-  };
-
-  onRefresh = async () => {
-    this.setState({page: 1});
-    await this.props.userhistory(`limit=5&page=${this.state.page}`);
-    const {dataHistoryUsers, isLoading} = this.props.users;
-    this.setState({
-      dataHistoryUsers,
-      isLoading,
-    });
   };
 
   rightSwipeOutButtons(id) {
@@ -80,38 +81,12 @@ class AllTransactions extends Component {
       }, */
       {
         onPress: () => this.prosesTransaction(id),
-        text: 'Return Book',
+        text: 'Proses',
         backgroundColor: '#7FFF00',
         color: '#000',
       },
     ];
   }
-
-  updateSearch = (search) => {
-    this.setState({search});
-  };
-
-  // Handle searchbar
-  handleSearch = async (e) => {
-    const {search} = this.state;
-    await this.props.userhistory(
-      'limit=20&search='.concat(search.toLowerCase()),
-    );
-    const {dataHistoryUsers, isLoading} = this.props.users;
-    this.setState({dataHistoryUsers, isLoading});
-  };
-
-  handleSearchClear = async (e) => {
-    await this.props.userhistory('search='.concat(''));
-    const {dataHistoryUsers, isLoading} = this.props.users;
-    this.setState({dataHistoryUsers, isLoading});
-  };
-
-  loadMore = () => {
-    this.setState({page: this.state.page + 1}, () => {
-      this.fetchData({page: this.state.page});
-    });
-  };
 
   renderItem = ({item}) => (
     <Swipeout
@@ -127,7 +102,6 @@ class AllTransactions extends Component {
               uri: url + item.picture,
             }}
           />
-          {console.log(item)}
         </View>
         <View style={TransactionStyle.Wrapper}>
           <View style={TransactionStyle.WrapperText}>
@@ -149,48 +123,51 @@ class AllTransactions extends Component {
   );
 
   render() {
-    const {dataHistoryUsers, isLoading} = this.state;
+    const {currentSearch, dataTransactions, isLoading} = this.state;
     return (
       <SafeAreaView style={TransactionStyle.container}>
-        <Header
-          leftComponent={
-            <Icon
-              name="arrow-back"
-              color="#fff"
-              onPress={() => this.props.navigation.goBack()}
+        {this.state.isLoading && (
+          <View style={TransactionStyle.loading}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        )}
+        {!this.state.isLoading && (
+          <>
+            <Header
+              centerComponent={{
+                text: 'On Proses',
+                style: {color: '#fff'},
+              }}
+              rightComponent={
+                <Icon
+                  name="paper"
+                  color="#fff"
+                  onPress={() =>
+                    this.props.navigation.navigate('alltransactions')
+                  }
+                />
+              }
             />
-          }
-          centerComponent={{
-            text: 'All Transaction',
-            style: {color: '#fff'},
-          }}
-        />
-        <SearchBar
-          platform="ios"
-          placeholder="Type Here..."
-          value={this.state.search}
-          onChangeText={(search) => this.setState({search})}
-          returnKeyType={'search'}
-          onSubmitEditing={this.handleSearch}
-          onCancel={this.handleSearchClear}
-          onClear={this.handleSearchClear}
-        />
-        <View>
-          {dataHistoryUsers.length !== 0 && (
-            <FlatList
-              data={dataHistoryUsers}
-              keyExtractor={(item) => item.id}
-              refreshing={isLoading}
-              renderItem={this.renderItem}
-              onEndReachedThreshold={0.5}
-            />
-          )}
-          {dataHistoryUsers.length === 0 && (
-            <Card>
-              <Text>No have a transaction</Text>
-            </Card>
-          )}
-        </View>
+            <View>
+              {dataTransactions.length !== 0 && (
+                <FlatList
+                  data={dataTransactions}
+                  keyExtractor={(item) => item.id}
+                  onRefresh={() => this.fetchData({search: currentSearch})}
+                  refreshing={isLoading}
+                  renderItem={this.renderItem}
+                  onEndReached={this.nextPage}
+                  onEndReachedThreshold={0.5}
+                />
+              )}
+              {dataTransactions.length === 0 && (
+                <Card>
+                  <Text>No have a transaction</Text>
+                </Card>
+              )}
+            </View>
+          </>
+        )}
       </SafeAreaView>
     );
   }
@@ -204,11 +181,11 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   gettransactions,
-  userhistory,
   updatetransactions,
+  userhistory,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AllTransactions);
+export default connect(mapStateToProps, mapDispatchToProps)(AdminProses);
 
 const TransactionStyle = StyleSheet.create({
   loading: {
@@ -261,10 +238,5 @@ const TransactionStyle = StyleSheet.create({
     width: 70,
     height: 20,
     borderRadius: 5,
-  },
-  sort: {
-    marginRight: 15,
-    justifyContent: 'flex-end',
-    flexDirection: 'row',
   },
 });

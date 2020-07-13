@@ -1,19 +1,31 @@
 import React, {Component} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-ionicons';
-
+import {connect} from 'react-redux';
+import jwt_decode from 'jwt-decode';
 import DashboardScreen from '../../screens/Homes/Dashboard';
 
 // transactions
 import onProses from '../../screens/transactions/Proses';
 
-import HistoryScreen from '../../screens/Profiles/History';
+import AdminOnProses from '../../screens/transactions/AdminProses';
+
 import ProfileScreen from '../../screens/Profiles/Profile';
 
 const BottomTab = createBottomTabNavigator();
 
-export default class Tab extends Component {
+class Tab extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: jwt_decode(this.props.auth.token) || {
+        email: '',
+        role: '',
+      },
+    };
+  }
   render() {
+    const {role} = this.state.user;
     return (
       <BottomTab.Navigator>
         <BottomTab.Screen
@@ -36,16 +48,18 @@ export default class Tab extends Component {
           component={onProses}
           name="prosses"
         />
-        {/*         <BottomTab.Screen
-          options={{
-            title: 'History',
-            tabBarIcon: ({color, size}) => (
-              <Icon name="trending-up" solid color={color} size={size} />
-            ),
-          }}
-          component={HistoryScreen}
-          name="history"
-        /> */}
+        {role === 'admin' && (
+          <BottomTab.Screen
+            options={{
+              title: 'Admin Transaction',
+              tabBarIcon: ({color, size}) => (
+                <Icon name="paper" solid color={color} size={size} />
+              ),
+            }}
+            component={AdminOnProses}
+            name="adminproses"
+          />
+        )}
         <BottomTab.Screen
           options={{
             title: 'Profile',
@@ -60,3 +74,8 @@ export default class Tab extends Component {
     );
   }
 }
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+
+export default connect(mapStateToProps, null)(Tab);

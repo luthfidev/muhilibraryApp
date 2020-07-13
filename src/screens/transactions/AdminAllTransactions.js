@@ -13,14 +13,15 @@ import {
   updatetransactions,
 } from '../../redux/actions/transaction';
 import {userhistory} from '../../redux/actions/user';
-class AllTransactions extends Component {
+class AdminAllTransactions extends Component {
   constructor() {
     super();
     this.state = {
       isLoading: true,
-      dataHistoryUsers: [],
+      dataTransactions: [],
       refreshing: false,
       page: 1,
+      sort: 0,
       search: '',
     };
   }
@@ -30,7 +31,9 @@ class AllTransactions extends Component {
 
   componentDidUpdate(prevProps) {
     // don't forget to compare the props
-    if (this.props.users.isSuccess !== prevProps.users.isSuccess) {
+    if (
+      this.props.transactions.isSuccess !== prevProps.transactions.isSuccess
+    ) {
       this.fetchData();
     }
   }
@@ -46,27 +49,30 @@ class AllTransactions extends Component {
   };
 
   fetchData = async () => {
-    const {token} = this.props.auth;
     await this.props
-      .userhistory(token, `limit=5&page=${this.state.page}`)
+      .gettransactions(
+        `sort=${this.state.sort}&limit=5&page=${this.state.page}`,
+      )
       .then((response) => {
-        const {dataHistoryUsers, isLoading} = this.props.users;
+        const {dataTransactions, isLoading} = this.props.transactions;
         this.setState({
-          dataHistoryUsers,
+          dataTransactions: this.state.dataTransactions.concat(
+            dataTransactions,
+          ),
           isLoading,
         });
       })
       .catch((error) => {
-        this.setState({dataHistoryUsers: [], isLoading: false});
+        this.setState({dataTransactions: [], isLoading: false});
       });
   };
 
   onRefresh = async () => {
     this.setState({page: 1});
-    await this.props.userhistory(`limit=5&page=${this.state.page}`);
-    const {dataHistoryUsers, isLoading} = this.props.users;
+    await this.props.gettransactions(`limit=5&page=${this.state.page}`);
+    const {dataTransactions, isLoading} = this.props.transactions;
     this.setState({
-      dataHistoryUsers,
+      dataTransactions,
       isLoading,
     });
   };
@@ -94,17 +100,17 @@ class AllTransactions extends Component {
   // Handle searchbar
   handleSearch = async (e) => {
     const {search} = this.state;
-    await this.props.userhistory(
+    await this.props.gettransactions(
       'limit=20&search='.concat(search.toLowerCase()),
     );
-    const {dataHistoryUsers, isLoading} = this.props.users;
-    this.setState({dataHistoryUsers, isLoading});
+    const {dataTransactions, isLoading} = this.props.transactions;
+    this.setState({dataTransactions, isLoading});
   };
 
   handleSearchClear = async (e) => {
-    await this.props.userhistory('search='.concat(''));
-    const {dataHistoryUsers, isLoading} = this.props.users;
-    this.setState({dataHistoryUsers, isLoading});
+    await this.props.gettransactions('search='.concat(''));
+    const {dataTransactions, isLoading} = this.props.transactions;
+    this.setState({dataTransactions, isLoading});
   };
 
   loadMore = () => {
@@ -149,7 +155,7 @@ class AllTransactions extends Component {
   );
 
   render() {
-    const {dataHistoryUsers, isLoading} = this.state;
+    const {dataTransactions, isLoading} = this.state;
     return (
       <SafeAreaView style={TransactionStyle.container}>
         <Header
@@ -176,16 +182,30 @@ class AllTransactions extends Component {
           onClear={this.handleSearchClear}
         />
         <View>
-          {dataHistoryUsers.length !== 0 && (
+          <View style={TransactionStyle.sort}>
+            <DropDownPicker
+              placeholder="Sort"
+              items={[
+                {label: 'A-z', value: 1},
+                {label: 'Z-a', value: 0},
+              ]}
+              defaultIndex={0}
+              containerStyle={{width: 100, height: 40}}
+              onChangeItem={() => this.fetchData({sort: 1})}
+            />
+          </View>
+          {dataTransactions.length !== 0 && (
             <FlatList
-              data={dataHistoryUsers}
+              data={dataTransactions}
               keyExtractor={(item) => item.id}
+              onRefresh={this.loadMore}
               refreshing={isLoading}
               renderItem={this.renderItem}
+              onEndReached={this.loadMore}
               onEndReachedThreshold={0.5}
             />
           )}
-          {dataHistoryUsers.length === 0 && (
+          {dataTransactions.length === 0 && (
             <Card>
               <Text>No have a transaction</Text>
             </Card>
@@ -208,7 +228,10 @@ const mapDispatchToProps = {
   updatetransactions,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AllTransactions);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AdminAllTransactions);
 
 const TransactionStyle = StyleSheet.create({
   loading: {

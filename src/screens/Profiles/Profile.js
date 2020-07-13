@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import qs from 'querystring';
 import {
   Platform,
   StyleSheet,
@@ -71,7 +70,7 @@ class Profile extends Component {
   }
   navigateEditProfile = () => {
     const {id} = this.state.user;
-    console.log(id)
+    console.log(id);
     this.props.navigation.navigate('editprofile', id);
   };
 
@@ -166,6 +165,7 @@ class Profile extends Component {
 
   render() {
     const {avatar} = this.state;
+    const {role} = this.state.user;
     return (
       <SafeAreaView style={profileStyle.container}>
         <View style={profileStyle.header}>
@@ -217,7 +217,7 @@ class Profile extends Component {
           </View>
         </View>
         <ScrollView>
-          <CardView />
+          {role === 'admin' && <CardView />}
           <View style={profileStyle.wrapperLogout}>
             <ThemeProvider theme={themeBtn}>
               <Button

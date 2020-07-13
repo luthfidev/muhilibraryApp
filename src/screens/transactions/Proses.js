@@ -24,7 +24,7 @@ class Proses extends Component {
     super();
     this.state = {
       isLoading: true,
-      dataTransactions: [],
+      dataHistoryUsers: [],
       refreshing: false,
       currentSearch: 'Pending',
       search: '',
@@ -36,9 +36,7 @@ class Proses extends Component {
 
   componentDidUpdate(prevProps) {
     // don't forget to compare the props
-    if (
-      this.props.transactions.isSuccess !== prevProps.transactions.isSuccess
-    ) {
+    if (this.props.users.isSuccess !== prevProps.users.isSuccess) {
       this.fetchData();
     }
   }
@@ -47,11 +45,11 @@ class Proses extends Component {
     await this.props
       .gettransactions('search=Pending')
       .then((response) => {
-        const {dataTransactions, isLoading} = this.props.transactions;
-        this.setState({dataTransactions: dataTransactions, isLoading});
+        const {dataHistoryUsers, isLoading} = this.props.users;
+        this.setState({dataHistoryUsers, isLoading});
       })
       .catch((error) => {
-        this.setState({dataTransactions: [], isLoading: false});
+        this.setState({dataHistoryUsers: [], isLoading: false});
       });
   };
 
@@ -65,7 +63,7 @@ class Proses extends Component {
   prosesTransaction = async (id) => {
     this.setState({refreshing: true});
     const data = {
-      statusid: 2,
+      statusid: 4,
     };
     await this.props.updatetransactions(id, data);
     this.fetchData();
@@ -81,7 +79,7 @@ class Proses extends Component {
       }, */
       {
         onPress: () => this.prosesTransaction(id),
-        text: 'Proses',
+        text: 'Cancel',
         backgroundColor: '#7FFF00',
         color: '#000',
       },
@@ -123,7 +121,7 @@ class Proses extends Component {
   );
 
   render() {
-    const {currentSearch, dataTransactions, isLoading} = this.state;
+    const {currentSearch, dataHistoryUsers, isLoading} = this.state;
     return (
       <SafeAreaView style={TransactionStyle.container}>
         {this.state.isLoading && (
@@ -149,18 +147,17 @@ class Proses extends Component {
               }
             />
             <View>
-              {dataTransactions.length !== 0 && (
+              {dataHistoryUsers.length !== 0 && (
                 <FlatList
-                  data={dataTransactions}
+                  data={dataHistoryUsers}
                   keyExtractor={(item) => item.id}
                   onRefresh={() => this.fetchData({search: currentSearch})}
                   refreshing={isLoading}
                   renderItem={this.renderItem}
-                  onEndReached={this.nextPage}
                   onEndReachedThreshold={0.5}
                 />
               )}
-              {dataTransactions.length === 0 && (
+              {dataHistoryUsers.length === 0 && (
                 <Card>
                   <Text>No have a transaction</Text>
                 </Card>
