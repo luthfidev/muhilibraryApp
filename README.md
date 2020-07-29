@@ -1,3 +1,10 @@
+<h1 align='center'>Muhilibrary App<br>Mobile Library Application</h1>
+
+<p align='center'>
+    <img width="800" src='https://raw.githubusercontent.com/luthfidev/muhilibraryApp/master/Prototype/muhilibrary.jpeg' />
+</p>
+<br>
+<br>
 # Introduction
 
 Library application, makes it easier to make loan transactions using an Android smartphone.
