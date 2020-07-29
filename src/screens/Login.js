@@ -4,15 +4,20 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   SafeAreaView,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
-import {Button, colors, ThemeProvider} from 'react-native-elements';
+import {colors, ThemeProvider} from 'react-native-elements';
+import SplashScreen from 'react-native-splash-screen';
+import {connect} from 'react-redux';
+
+import {login} from '../redux/actions/auth';
 import Logo from '../components/Logo';
+import FormLogin from '../components/Auth/FormLogin';
 
 const DismissKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -20,32 +25,26 @@ const DismissKeyboard = ({children}) => (
   </TouchableWithoutFeedback>
 );
 
-export default class Login extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true,
-      btnLoading: false,
+      isLoading: false,
     };
   }
 
-  UNSAFE_componentWillMount() {
+  /*  UNSAFE_componentWillMount() {
     setTimeout(() => {
       this.setState({
+        error: null,
+        errorInfo: null,
         isLoading: false,
       });
     }, 3000);
+  } */
+  componentDidMount() {
+    SplashScreen.hide();
   }
-
-  handleSubmit = () => {
-    this.setState({btnLoading: true});
-    this.props.navigation.navigate('detail');
-    this.setState({btnLoading: false});
-  };
-
-  navigateSignup = () => {
-    this.props.navigation.navigate('register');
-  };
 
   render() {
     return (
@@ -63,36 +62,14 @@ export default class Login extends Component {
                   <Logo />
                   <Text style={loginStyle.logotext}>Log In</Text>
                 </View>
-                <View style={loginStyle.form}>
-                  <View style={loginStyle.field}>
-                    <TextInput
-                      style={loginStyle.input}
-                      underlineColorAndroid="transparent"
-                      placeholder="Email"
-                      placeholderTextColor="#00a8ff"
-                      autoCapitalize="none"
-                    />
-                    <TextInput
-                      style={loginStyle.input}
-                      underlineColorAndroid="transparent"
-                      placeholder="Password"
-                      placeholderTextColor="#00a8ff"
-                      autoCapitalize="none"
-                    />
-                  </View>
-                  <Button
-                    title="Login"
-                    loading={this.state.btnLoading}
-                    onPress={this.handleSubmit}
-                  />
-                  <View style={loginStyle.signup}>
-                    <Text>Don't have account ?</Text>
-                    <Text
-                      style={loginStyle.btnSignup}
-                      onPress={this.navigateSignup}>
-                      Sign Up
-                    </Text>
-                  </View>
+                <FormLogin />
+                <View style={loginStyle.signup}>
+                  <Text>Don't have account ?</Text>
+                  <Text
+                    style={loginStyle.btnSignup}
+                    onPress={() => this.props.navigation.navigate('register')}>
+                    Sign Up
+                  </Text>
                 </View>
               </KeyboardAvoidingView>
             )}
@@ -102,6 +79,13 @@ export default class Login extends Component {
     );
   }
 }
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+
+const mapDispatchToProps = {login};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
 
 const theme = {
   color: {
@@ -129,7 +113,7 @@ const loginStyle = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#E3E6ED',
+    backgroundColor: '#f5f6fa',
     alignItems: 'center',
   },
   logotext: {
@@ -140,37 +124,9 @@ const loginStyle = StyleSheet.create({
     color: '#e84118',
     textDecorationLine: 'underline',
   },
-  form: {
-    alignItems: 'center',
-  },
-  field: {
-    width: 300,
-  },
-  input: {
-    margin: 10,
-    height: 45,
-    borderColor: '#0097e6',
-    borderWidth: 1,
-    borderRadius: 30,
-    paddingLeft: 15,
-  },
-  button: {
-    width: 200,
-    height: 20,
-    marginTop: 15,
-    borderRadius: 15,
-    padding: 25,
-    backgroundColor: '#0097e6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  btntext: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#f5f6fa',
-  },
   signup: {
     marginTop: 25,
+    justifyContent: 'center',
     flexDirection: 'row',
   },
   btnSignup: {

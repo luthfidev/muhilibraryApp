@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">muhilibraryApp</string>
+    <string name="app_name">MuhilibraryApp</string>
+    <string name="splash1">SPLASH</string>
+    <string name="textview">Welcome to Muhilibrary V.1.0</string>
 </resources>

@@ -1,16 +1,9 @@
 import React, {Component} from 'react';
-// import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
+import {store, persistor} from './src/redux/store';
 
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-
-import LoginScreen from './src/screens/Login';
-import RegisterScreen from './src/screens/Register';
-
-import DetailBookScreen from './src/screens/DetailBook';
-import Tab from './src/components/Tab';
-
-const Stack = createStackNavigator();
+import Navigation from './src/components/navigations/Stack';
 
 export default class App extends Component {
   constructor(props) {
@@ -21,32 +14,13 @@ export default class App extends Component {
   }
 
   render() {
-    const Login = (props) => <LoginScreen login={this.login} {...props} />;
     return (
       <>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              component={Login}
-              options={{
-                headerShown: false,
-              }}
-              name={'login'}
-            />
-            <Stack.Screen
-              component={RegisterScreen}
-              options={{
-                headerShown: false,
-              }}
-              name={'register'}
-            />
-            <Stack.Screen
-              options={{title: 'Detail', headerShown: false}}
-              component={Tab}
-              name={'detail'}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <Provider store={store}>
+          <PersistGate persistor={persistor}>
+            <Navigation />
+          </PersistGate>
+        </Provider>
       </>
     );
   }

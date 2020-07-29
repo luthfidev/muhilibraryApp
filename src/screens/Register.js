@@ -3,14 +3,19 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   SafeAreaView,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  TouchableOpacity,
   ActivityIndicator,
+  Alert,
+  Platform,
+  TouchableOpacity,
 } from 'react-native';
+import {colors, ThemeProvider, Header} from 'react-native-elements';
+import {connect} from 'react-redux';
+import FormRegister from '../components/Auth/FormRegister';
+import {register} from '../redux/actions/auth';
 import {LogoRegister} from '../components/Logo';
 
 const DismissKeyboard = ({children}) => (
@@ -19,10 +24,12 @@ const DismissKeyboard = ({children}) => (
   </TouchableWithoutFeedback>
 );
 
-export default class Register extends Component {
+class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      email: '',
+      password: '',
       isLoading: true,
     };
   }
@@ -31,68 +38,79 @@ export default class Register extends Component {
       this.setState({
         isLoading: false,
       });
-    }, 3000);
+    }, 1000);
   }
-
-  navigateLogin = () => {
-    this.props.navigation.navigate('login');
-  };
 
   render() {
     return (
-      <DismissKeyboard>
-        <SafeAreaView style={registerStyle.container}>
-          {this.state.isLoading && (
-            <View style={registerStyle.loading}>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          )}
-          {!this.state.isLoading && (
-            <KeyboardAvoidingView behavior="position">
-              <View>
-                <LogoRegister />
-                <Text style={registerStyle.logotext}>Register</Text>
+      <ThemeProvider theme={theme}>
+        <DismissKeyboard>
+          <SafeAreaView style={registerStyle.container}>
+            {this.state.isLoading && (
+              <View style={registerStyle.loading}>
+                <ActivityIndicator size="large" color="#0000ff" />
               </View>
-              <View style={registerStyle.form}>
-                <View style={registerStyle.field}>
-                  <TextInput
-                    style={registerStyle.input}
-                    underlineColorAndroid="transparent"
-                    placeholder="Email"
-                    placeholderTextColor="#00a8ff"
-                    autoCapitalize="none"
-                  />
-                  <TextInput
-                    style={registerStyle.input}
-                    underlineColorAndroid="transparent"
-                    placeholder="Password"
-                    placeholderTextColor="#00a8ff"
-                    autoCapitalize="none"
-                  />
-                </View>
-                <TouchableOpacity>
-                  <View style={registerStyle.button}>
-                    <Text style={registerStyle.btntext}>Register</Text>
+            )}
+            {!this.state.isLoading && (
+              <>
+                <Header
+                  centerComponent={
+                    <TouchableOpacity>
+                      <View style={registerStyle.btnDown} />
+                    </TouchableOpacity>
+                  }
+                />
+                <KeyboardAvoidingView behavior="position">
+                  <View>
+                    <LogoRegister />
+                    <Text style={registerStyle.logotext}>Register</Text>
                   </View>
-                </TouchableOpacity>
-                <View style={registerStyle.signup}>
-                  <Text>Don't have account ?</Text>
-                  <Text
-                    style={registerStyle.btnLogin}
-                    onPress={this.navigateLogin}>
-                    Sign In
-                  </Text>
-                </View>
-              </View>
-            </KeyboardAvoidingView>
-          )}
-        </SafeAreaView>
-      </DismissKeyboard>
+                  <FormRegister />
+                </KeyboardAvoidingView>
+              </>
+            )}
+          </SafeAreaView>
+        </DismissKeyboard>
+      </ThemeProvider>
     );
   }
 }
 
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+
+const mapDispatchToProps = {register};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);
+
+const theme = {
+  color: {
+    ...Platform.select({
+      default: colors.platform.android,
+      ios: colors.platform.ios,
+    }),
+  },
+  Button: {
+    buttonStyle: {
+      backgroundColor: '#e84118',
+    },
+    containerStyle: {
+      marginTop: 5,
+      width: 200,
+      borderRadius: 5,
+    },
+  },
+};
+
 const registerStyle = StyleSheet.create({
+  btnDown: {
+    width: 90,
+    height: 10,
+    marginBottom: 50,
+    backgroundColor: '#f5f6fa',
+    borderRadius: 10,
+  },
   loading: {
     flex: 1,
     justifyContent: 'center',
