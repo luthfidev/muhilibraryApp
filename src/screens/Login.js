@@ -113,7 +113,7 @@ const loginStyle = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#E3E6ED',
+    backgroundColor: '#f5f6fa',
     alignItems: 'center',
   },
   logotext: {

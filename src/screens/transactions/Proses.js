@@ -12,7 +12,7 @@ import Swipeout from 'react-native-swipeout';
 import Icon from 'react-native-ionicons';
 import moment from 'moment';
 import {REACT_APP_URL} from 'react-native-dotenv';
-const url = `${REACT_APP_URL}`;
+const url = `https://api-muhilibrary.herokuapp.com/`;
 import {connect} from 'react-redux';
 import {
   gettransactions,
@@ -98,7 +98,7 @@ class Proses extends Component {
             rounded
             size="large"
             source={{
-              uri: url + item.picture,
+              uri: 'https://api-muhilibrary.herokuapp.com/uploads/default.png',
             }}
           />
         </View>

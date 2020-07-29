@@ -253,8 +253,8 @@ class Dashboard extends Component {
                 />
               </View>
               {dataBooks.length !== 0 && (
-                <View style={dashboardStyle.booklist}>
-                  <Text style={dashboardStyle.titlelist}>Humor</Text>
+               <View style={dashboardStyle.booklist}>
+                   {/* <Text style={dashboardStyle.titlelist}>Science</Text>
                   <FlatList
                     horizontal
                     style={dashboardStyle.booklist}
@@ -274,7 +274,7 @@ class Dashboard extends Component {
                     keyExtractor={(item) => item.email}
                     onRefresh={() => this.fetchData({page: currentPage})}
                     refreshing={isLoading}
-                  />
+                  /> */}
                   <Divider style={{backgroundColor: 'grey'}} />
                   <FlatList
                     horizontal
