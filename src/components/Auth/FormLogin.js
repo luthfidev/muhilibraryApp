@@ -58,7 +58,7 @@ const FormLogin = () => {
           control={control}
           render={({onChange, onBlur, value}) => (
             <TextInput
-              type="text"
+              type="password"
               style={loginStyle.input}
               underlineColorAndroid="transparent"
               placeholder="Password"
