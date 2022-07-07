@@ -19,7 +19,7 @@
     "axios": "^0.19.2",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
-    "moment": "^2.27.0",
+    "moment": "^2.29.4",
     "querystring": "^0.2.0",
     "react": "16.11.0",
     "react-hook-form": "^6.0.2",
